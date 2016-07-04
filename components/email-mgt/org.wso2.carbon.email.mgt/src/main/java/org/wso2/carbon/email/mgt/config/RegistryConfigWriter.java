@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.email.mgt.constants.I18nMgtConstants;
 import org.wso2.carbon.email.mgt.exceptions.I18nMgtEmailConfigException;
+import org.wso2.carbon.email.mgt.internal.I18nMgtDataHolder;
 import org.wso2.carbon.email.mgt.internal.I18nMgtServiceComponent;
 import org.wso2.carbon.registry.core.Collection;
 import org.wso2.carbon.registry.core.Resource;
@@ -53,7 +54,7 @@ public class RegistryConfigWriter implements ConfigWriter {
 			log.debug("Saving email template at registry path : " + resourcePath);
 		}
 
-		RegistryService registry = I18nMgtServiceComponent.getRegistryService();
+		RegistryService registry = I18nMgtDataHolder.getInstance().getRegistryService();
 		try {
 			UserRegistry userReg = registry.getConfigSystemRegistry(tenantId);
 			Set<String> names = props.stringPropertyNames();
