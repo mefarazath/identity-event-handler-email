@@ -40,4 +40,7 @@ public class I18nMgtConstants {
 
     public static final String EMAIL_MEDIA_TYPE = "text/plain";
 
+    public static final String EMAIL_TEMPLATE_NAME = "templateName";
+    public static final String EMAIL_TEMPLATE_DISPLAY_NAME = "templateDisplayName";
+
 }

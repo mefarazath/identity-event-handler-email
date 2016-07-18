@@ -83,6 +83,7 @@
                             org.apache.axis2.context;version="${axis2.wso2.imp.pkg.version.range}",
                             org.apache.commons.logging;version="${commons.logging.imp.pkg.version.range}",
                             org.wso2.carbon.email.mgt.dto.xsd.*;version="${identity.event.handler.email.imp.pkg.version.range}",
+                            org.wso2.carbon.email.mgt.model.xsd.*;version="${identity.event.handler.email.imp.pkg.version.range}",
                             org.wso2.carbon.email.mgt.stub.*;version="${identity.event.handler.email.imp.pkg.version.range}",
                         </Import-Package>
                         <Carbon-Component>UIBundle</Carbon-Component>

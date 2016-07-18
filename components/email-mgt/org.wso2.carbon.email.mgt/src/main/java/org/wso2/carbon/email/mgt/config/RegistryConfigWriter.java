@@ -66,11 +66,17 @@ public class RegistryConfigWriter implements ConfigWriter {
 					String[] propertyArray = propsKeyName.split("\\|");
 					value.add(propertyArray[1]);
 					Collection emailCollection = userReg.newCollection();
-					String emailTemplateFolderName = propertyArray[0].replaceAll("\\s", "").toLowerCase();
-					String defaultEmailLocale = propertyArray[2];
-					emailCollection.setProperty(emailTemplateFolderName, value);
 
-					String emailTemplateFilename = emailTemplateFolderName + I18nMgtConstants.EMAIL_LOCALE_SEPARATOR +
+                    String emailTemplateDisplayName = propertyArray[0];
+                    String emailTemplateFolderName = propertyArray[0].replaceAll("\\s", "").toLowerCase();
+					String defaultEmailLocale = propertyArray[2];
+
+					emailCollection.setProperty(emailTemplateFolderName, value);
+                    emailCollection.setProperty(I18nMgtConstants.EMAIL_TEMPLATE_NAME, emailTemplateFolderName);
+                    emailCollection.setProperty(I18nMgtConstants.EMAIL_TEMPLATE_DISPLAY_NAME, emailTemplateDisplayName);
+
+
+                    String emailTemplateFilename = emailTemplateFolderName + I18nMgtConstants.EMAIL_LOCALE_SEPARATOR +
 							defaultEmailLocale;
 					String emailTemplateFolderResourcePath = resourcePath +
 							I18nMgtConstants.EMAIL_FOLDER_SEPARATOR + emailTemplateFolderName;

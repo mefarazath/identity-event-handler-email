@@ -33,35 +33,38 @@
 <jsp:include page="../dialog/display_messages.jsp"/>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="java.util.*" %>
-<%@ page import="java.lang.reflect.Array" %>
 <%@ page import="org.owasp.encoder.Encode" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.wso2.carbon.email.mgt.ui.I18nEmailMgtConfigServiceClient" %>
 <%@ page import="org.wso2.carbon.email.mgt.ui.EmailConfigDTO" %>
 <%@ page import="org.wso2.carbon.email.mgt.dto.xsd.EmailTemplateDTO" %>
+<%@ page import="org.wso2.carbon.email.mgt.model.xsd.EmailTemplateType" %>
+<%@ page import="org.apache.commons.lang.ArrayUtils" %>
 
 <%
     String localeParam = request.getParameter("locale");
 
-    if (localeParam == null) {
+    if (StringUtils.isBlank(localeParam)) {
         localeParam = "English (United States)";
     }
+
+    String templateType = request.getParameter("templateType");
 
     String username = request.getParameter("username");
     String forwardTo = null;
     I18nEmailMgtConfigServiceClient client = null;
 
     EmailConfigDTO emailConfig = null;
-    String emailSubject = null;
-    String emailBody = null;
-    String emailFooter = null;
-    String templateName = null;
-    String emailSubject0 = null;
-    String emailBody0 = null;
-    String emailFooter0 = null;
-    String templateName0 = null;
+    String emailSubject = "";
+    String emailBody = "";
+    String emailFooter = "";
+    String templateName = "";
+    String emailSubject0 = "";
+    String emailBody0 = "";
+    String emailFooter0 = "";
+    String templateName0 = "";
     String displayLanguage = null;
-    String displayLanguage0 = null;
+    String displayLanguage0 = "";
     String emailContentType = null;
     String emailContentType0 = null;
     String[] emailContentTypeArr = {"text/html", "text/plain"};
@@ -73,6 +76,7 @@
     String BUNDLE = "org.wso2.carbon.email.mgt.ui.i18n.Resources";
     ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE, request.getLocale());
 
+    EmailTemplateType[] emailTemplateTypes = null;
     try {
         String cookie = (String) session
                 .getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
@@ -83,6 +87,9 @@
                         CarbonConstants.CONFIGURATION_CONTEXT);
         client = new I18nEmailMgtConfigServiceClient(cookie,
                 backendServerURL, configContext);
+
+        // get template types
+        emailTemplateTypes = client.getEmailTemplateTypes();
         emailConfig = client.loadEmailConfig();
 
     } catch (Exception e) {
@@ -103,14 +110,16 @@
         jQuery('#emailContentType').val($selectedOption.attr('data-emailContentType'));
     }
 
+
     function updateLocale(elm) {
         var $selectedOption = jQuery(elm).find(":selected").text().trim();
         jQuery('<form>', {
-            "id": "getLocale",
-            "html": '<input type="text" name="locale" value="' + $selectedOption + '" />',
+            "id": "getTemplateType",
+            "html": '<input type="text" name="templateType" value="' + $selectedOption + '" />',
             "action": window.location.href
         }).appendTo(document.body).submit();
     }
+
 </script>
 <%
     if (forwardTo != null) {
@@ -153,45 +162,39 @@
                 <div class=”sectionSub”>
                     <table class="carbonFormTable">
                         <tr>
-                            <td class="leftCol-med labelField"><fmt:message key="email.language"/></td>
-                            <td><select id="emailLanguage" name="emailLanguage" class="leftCol-med"
-                                        onchange="updateLocale(this)">
+                            <td class="leftCol-med labelField"><fmt:message key="email.types"/></td>
+                            <td><select id="emailTypes" name="emailTypes" class="leftCol-med"
+                                        onchange="updateLocale(this);">
                                 <%
-                                    EmailTemplateDTO[] templates = emailConfig.getTemplates();
-
-                                    Set<String> localeList = new HashSet<String>();
-                                    for (int i = 0; i < templates.length; i++) {
-                                        EmailTemplateDTO template = templates[i];
-                                        localeList.add(template.getLocale());
+                                    for (EmailTemplateDTO emailTemplateDTO : emailConfig.getTemplates()) {
+                                        String displayName = emailTemplateDTO.getDisplayName();
+                                        String selected = StringUtils.equalsIgnoreCase(templateType, displayName) ? "selected" : "";
+                                %>
+                                    <option value="<%=displayName%>" <%=selected%>>
+                                        <%=Encode.forHtmlContent(displayName)%>
+                                    </option>
+                                <%
                                     }
 
-                                    for (String localeStr : localeList) {
-                                        String str = "";
-                                        if (StringUtils.equals(localeParam, localeStr)) {
-                                            str = "selected";
+                                    if (StringUtils.isBlank(templateType)) {
+                                        if (ArrayUtils.isNotEmpty(emailTemplateTypes)) {
+                                            templateType = emailTemplateTypes[0].getDisplayName();
                                         }
-                                %>
-                                <option value="<%=Encode.forHtmlAttribute(localeStr)%>"
-                                        <%=str%>>
-                                    <%=Encode.forHtmlContent(localeStr)%>
-                                </option>
-                                <%
                                     }
                                 %>
+
                             </select></td>
                         </tr>
                         <tr>
-                            <td class="leftCol-med labelField"><fmt:message key="email.types"/></td>
-                            <td><select id="emailTypes" name="emailTypes" class="leftCol-med"
-                                        onchange="updateFields(this);">
+                            <td class="leftCol-med labelField"><fmt:message key="email.language"/></td>
+                            <td><select id="emailLanguage" name="emailLanguage" class="leftCol-med"
+                                        onchange="updateFields(this)">
                                 <%
-
-                                    EmailTemplateDTO[] templates1 = emailConfig.getTemplates();
+                                    EmailTemplateDTO[] templates = emailConfig.getTemplates();
 
                                     List<EmailTemplateDTO> templatesList = new ArrayList<EmailTemplateDTO>();
-                                    for (int i = 0; i < templates.length; i++) {
-                                        EmailTemplateDTO template = templates[i];
-                                        if (templates[i].getLocale().equalsIgnoreCase(localeParam)) {
+                                    for (EmailTemplateDTO template : templates) {
+                                        if (template.getDisplayName().equalsIgnoreCase(templateType)) {
                                             templatesList.add(template);
                                         }
                                     }
@@ -222,19 +225,36 @@
                                         data-footer="<%=Encode.forHtmlAttribute(emailFooter)%>"
                                         data-templateName="<%=Encode.forHtmlAttribute(templateName)%>"
                                         data-emailContentType="<%=Encode.forHtmlAttribute(emailContentType)%>">
-                                    <%=
-                                    Encode.forHtmlContent(template.getDisplayName())%>
+                                    <%=Encode.forHtmlContent(template.getLocale())%>
                                 </option>
                                 <%
                                     }
                                 %>
+
+
+<!-- CHange is there-->
+                                <%--<%--%>
+                                    <%--Set<String> localeList = new HashSet<String>();--%>
+                                    <%--for (int i = 0; i < templates.length; i++) {--%>
+                                        <%--EmailTemplateDTO template = templates[i];--%>
+                                        <%--localeList.add(template.getLocale());--%>
+                                    <%--}--%>
+
+                                    <%--for (String localeStr : localeList) {--%>
+                                        <%--String str = "";--%>
+                                        <%--if (StringUtils.equals(localeParam, localeStr)) {--%>
+                                            <%--str = "selected";--%>
+                                        <%--}--%>
+                                <%--%>--%>
+                                <%--<option value="<%=Encode.forHtmlAttribute(localeStr)%>"--%>
+                                        <%--<%=str%>>--%>
+                                    <%--<%=Encode.forHtmlContent(localeStr)%>--%>
+                                <%--</option>--%>
+                                <%--<%--%>
+                                    <%--}--%>
+                                <%--%>--%>
                             </select></td>
                         </tr>
-                        <%--<tr>--%>
-                            <%--<td><fmt:message key="emailContentType"/></td>--%>
-                            <%--<td><input type="text" name="emailContentType" id="emailContentType" style="width : 500px;"--%>
-                                       <%--value="<%=Encode.forHtmlAttribute(emailContentType0)%>"/></td>--%>
-                        <%--</tr>--%>
                         <tr>
                             <td class="leftCol-med labelField"><fmt:message key="email.template.content"/></td>
 

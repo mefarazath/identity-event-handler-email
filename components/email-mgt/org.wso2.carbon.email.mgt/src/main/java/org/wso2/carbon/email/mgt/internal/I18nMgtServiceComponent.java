@@ -77,6 +77,7 @@ public class I18nMgtServiceComponent {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         ConfigBuilder configBuilder = ConfigBuilder.getInstance();
         try {
+
             configBuilder.loadDefaultConfiguration(ConfigType.EMAIL, StorageType.REGISTRY, tenantId);
         } catch (I18nMgtEmailConfigException e) {
             log.error("Error occurred while loading default email templates", e);

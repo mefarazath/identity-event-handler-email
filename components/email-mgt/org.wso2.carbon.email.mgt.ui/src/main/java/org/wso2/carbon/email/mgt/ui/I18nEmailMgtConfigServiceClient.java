@@ -26,6 +26,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.email.mgt.dto.xsd.EmailTemplateDTO;
+import org.wso2.carbon.email.mgt.model.xsd.EmailTemplateType;
 import org.wso2.carbon.email.mgt.stub.I18NEmailMgtConfigServiceStub;
 
 import java.util.HashMap;
@@ -55,14 +56,11 @@ public class I18nEmailMgtConfigServiceClient {
     public I18nEmailMgtConfigServiceClient(String cookie, String url,
                                            ConfigurationContext configContext) throws Exception {
         try {
-            stub = new I18NEmailMgtConfigServiceStub(configContext, url
-                    + "I18nEmailMgtConfigService");
+            stub = new I18NEmailMgtConfigServiceStub(configContext, url + "I18nEmailMgtConfigService");
             ServiceClient client = stub._getServiceClient();
             Options option = client.getOptions();
             option.setManageSession(true);
-            option.setProperty(
-                    org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING,
-                    cookie);
+            option.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
         } catch (Exception e) {
             handleException(e.getMessage(), e);
         }
@@ -71,6 +69,36 @@ public class I18nEmailMgtConfigServiceClient {
     private String[] handleException(String msg, Exception e) throws AxisFault {
         log.error(msg, e);
         throw new AxisFault(msg, e);
+    }
+
+    /**
+     * Add a template type for a tenant.
+     *
+     * @param emailTemplateType
+     * @throws AxisFault
+     */
+    public void addTemplateType(EmailTemplateType emailTemplateType) throws AxisFault {
+        try {
+            stub.addEmailTemplateType(emailTemplateType);
+        } catch (Exception e) {
+            handleException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get all available template types in tenant domain.
+     *
+     * @return
+     * @throws AxisFault
+     */
+    public EmailTemplateType[] getEmailTemplateTypes() throws AxisFault {
+        EmailTemplateType[] emailTemplateTypes = new EmailTemplateType[0];
+        try {
+            emailTemplateTypes = stub.getEmailTemplateTypes();
+        } catch (Exception e) {
+            handleException(e.getMessage(), e);
+        }
+        return emailTemplateTypes;
     }
 
     /**

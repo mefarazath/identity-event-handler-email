@@ -26,12 +26,16 @@ import org.wso2.carbon.email.mgt.config.ConfigBuilder;
 import org.wso2.carbon.email.mgt.config.ConfigType;
 import org.wso2.carbon.email.mgt.config.EmailConfigTransformer;
 import org.wso2.carbon.email.mgt.config.EmailNotificationConfig;
+import org.wso2.carbon.email.mgt.config.EmailTemplateManager;
 import org.wso2.carbon.email.mgt.config.StorageType;
 import org.wso2.carbon.email.mgt.dto.EmailTemplateDTO;
+import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtException;
+import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtServiceException;
 import org.wso2.carbon.email.mgt.exceptions.I18nMgtEmailConfigException;
-import org.wso2.carbon.email.mgt.exceptions.I18nMgtServiceException;
+import org.wso2.carbon.email.mgt.model.EmailTemplateType;
 import org.wso2.carbon.identity.base.IdentityException;
 
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -41,15 +45,39 @@ import java.util.Properties;
 public class I18nEmailMgtConfigService {
 
     Log log = LogFactory.getLog(I18nEmailMgtConfigService.class);
+    private EmailTemplateManager templateManager = new EmailTemplateManager();
+
+    public void addEmailTemplateType(EmailTemplateType emailTemplateType) throws I18nEmailMgtServiceException {
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        try {
+            templateManager.addTemplateType(emailTemplateType, tenantDomain);
+        } catch (I18nEmailMgtException e) {
+            String errorMsg = String.format("Error while adding email template type to %s tenant.", tenantDomain);
+            log.error(errorMsg, e);
+            throw new I18nEmailMgtServiceException(errorMsg, e);
+        }
+    }
+
+    public EmailTemplateType[] getEmailTemplateTypes() throws I18nEmailMgtServiceException {
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        try {
+            List<EmailTemplateType> emailTemplateTypes = templateManager.getAvailableTemplateTypes(tenantDomain);
+            return emailTemplateTypes.toArray(new EmailTemplateType[emailTemplateTypes.size()]);
+        } catch (I18nEmailMgtException e) {
+            String errorMsg = String.format("Error while retrieving email template types of %s tenant.", tenantDomain);
+            log.error(errorMsg, e);
+            throw new I18nEmailMgtServiceException(errorMsg, e);
+        }
+    }
 
     /**
      * This method is used to save the email template specific to a tenant.
      *
      * @param emailTemplate - Email templates to be saved.
-     * @throws org.wso2.carbon.email.mgt.exceptions.I18nMgtServiceException
+     * @throws I18nEmailMgtServiceException
      */
     public void saveEmailConfig(EmailTemplateDTO emailTemplate)
-            throws I18nMgtServiceException {
+            throws I18nEmailMgtServiceException {
 
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         EmailNotificationConfig emailConfig = new EmailNotificationConfig();
@@ -62,10 +90,10 @@ public class I18nEmailMgtConfigService {
                     emailConfig);
         } catch (IdentityException e) {
             log.error("Error occurred while transforming to Email Template Object ", e);
-            throw new I18nMgtServiceException("Error occurred while saving email template configurations", e);
+            throw new I18nEmailMgtServiceException("Error occurred while saving email template configurations", e);
         } catch (I18nMgtEmailConfigException e) {
             log.error("Error occurred while saving email template configuration", e);
-            throw new I18nMgtServiceException("Error occurred while writing email template configurations to " +
+            throw new I18nEmailMgtServiceException("Error occurred while writing email template configurations to " +
                     "registry path", e);
         }
     }
@@ -74,9 +102,9 @@ public class I18nEmailMgtConfigService {
      * This method is used to add an email template specific to a tenant.
      *
      * @param emailTemplate - Email templates to be saved.
-     * @throws org.wso2.carbon.email.mgt.exceptions.I18nMgtServiceException
+     * @throws I18nEmailMgtServiceException
      */
-    public void addEmailConfig(EmailTemplateDTO emailTemplate) throws I18nMgtServiceException {
+    public void addEmailConfig(EmailTemplateDTO emailTemplate) throws I18nEmailMgtServiceException {
 
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         EmailNotificationConfig emailConfig = new EmailNotificationConfig();
@@ -90,10 +118,10 @@ public class I18nEmailMgtConfigService {
 
         } catch (IdentityException e) {
             log.error("Error occurred while transforming to Email Template Object ", e);
-            throw new I18nMgtServiceException("Error occurred adding an email template", e);
+            throw new I18nEmailMgtServiceException("Error occurred adding an email template", e);
         } catch (I18nMgtEmailConfigException e) {
             log.error("Error occurred while adding email template configuration to registry path", e);
-            throw new I18nMgtServiceException("Error occurred adding an email template", e);
+            throw new I18nEmailMgtServiceException("Error occurred adding an email template", e);
         }
     }
 
@@ -101,9 +129,9 @@ public class I18nEmailMgtConfigService {
      * This method is used to load the email template specific to a tenant.
      *
      * @return an Array of templates.
-     * @throws org.wso2.carbon.email.mgt.exceptions.I18nMgtServiceException
+     * @throws I18nEmailMgtServiceException
      */
-    public EmailTemplateDTO[] getEmailConfig() throws I18nMgtServiceException {
+    public EmailTemplateDTO[] getEmailConfig() throws I18nEmailMgtServiceException {
 
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         Config emailConfig = null;
@@ -118,7 +146,7 @@ public class I18nEmailMgtConfigService {
             }
         } catch (I18nMgtEmailConfigException e) {
             log.error("Error occurred while transforming to email template object ", e);
-            throw new I18nMgtServiceException("Error occurred while reading email templates", e);
+            throw new I18nEmailMgtServiceException("Error occurred while reading email templates", e);
         }
 
         return templates;

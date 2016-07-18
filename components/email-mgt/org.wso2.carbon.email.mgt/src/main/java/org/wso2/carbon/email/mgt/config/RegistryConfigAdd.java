@@ -87,7 +87,11 @@ public class RegistryConfigAdd implements ConfigWriter {
                     List<String> value = new ArrayList<String>();
                     value.add(emailTemplateDisplayName);
                     Collection emailCollection = userReg.newCollection();
+
                     emailCollection.setProperty(emailTemplateFolderName, value);
+                    emailCollection.setProperty(I18nMgtConstants.EMAIL_TEMPLATE_NAME, emailTemplateFolderName);
+                    emailCollection.setProperty(I18nMgtConstants.EMAIL_TEMPLATE_DISPLAY_NAME, emailTemplateDisplayName);
+
                     userReg.put(emailTemplateFolderResourcePath, emailCollection);
                     Resource resource = userReg.newResource();
                     resource.setMediaType(propsKeyNameSplit[2]);
