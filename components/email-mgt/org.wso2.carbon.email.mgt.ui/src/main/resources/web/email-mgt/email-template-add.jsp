@@ -31,6 +31,7 @@
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.ResourceBundle" %>
+<%@ page import="org.wso2.carbon.email.mgt.ui.Util" %>
 <script type="text/javascript" src="extensions/js/vui.js"></script>
 <script type="text/javascript" src="../extensions/core/js/vui.js"></script>
 <script type="text/javascript" src="../admin/js/main.js"></script>
@@ -119,6 +120,13 @@
                         return false;
                     }
 
+                    var emailLocaleIndex = document.getElementsByName("emailLocale")[0].selectedIndex;
+                    if (emailLocaleIndex == 0) {
+                        CARBON.showWarningDialog('<fmt:message key="email.template.locale.is.required"/>');
+                        return false;
+                    }
+
+
                     var value = document.getElementsByName("emailSubject")[0].value;
                     if (value == '') {
                         CARBON.showWarningDialog('<fmt:message key="email.template.subject.is.required"/>');
@@ -178,26 +186,13 @@
 
                                 <tr>
                                     <td class="leftCol-med labelField"><fmt:message
-                                            key="email.template.contentType"/></td>
-                                    <td><select id="emailContentType" name="emailContentType" class="leftCol-med">
-                                        <option>text/html</option>
-                                        <option>text/plain</option>
-                                    </select></td>
-                                </tr>
-                                <tr>
-                                    <td class="leftCol-med labelField"><fmt:message
                                             key="email.template.locale"/></td>
                                     <td><select id="emailLocale" name="emailLocale" class="leftCol-med">
                                         <%
                                             for (Locale aLocale : availableLocale) {
-                                                String languageCode = aLocale.getLanguage();
-                                                String countryCode = aLocale.getCountry();
-                                                if (StringUtils.isBlank(countryCode)) {
-                                                    countryCode = languageCode;
-                                                }
-                                                String localecode = languageCode + "_" + countryCode;
+                                                String localeCode = Util.getLocaleCode(aLocale);
                                         %>
-                                        <option value="<%=Encode.forHtmlAttribute(localecode)%>">
+                                        <option value="<%=Encode.forHtmlAttribute(localeCode)%>">
                                             <%=Encode.forHtmlContent(aLocale.getDisplayName())%>
                                         </option>
                                         <%
@@ -206,10 +201,18 @@
                                     </select></td>
                                 </tr>
                                 <tr>
+                                    <td class="leftCol-med labelField"><fmt:message
+                                            key="email.template.contentType"/></td>
+                                    <td><select id="emailContentType" name="emailContentType" class="leftCol-med">
+                                        <option>text/html</option>
+                                        <option>text/plain</option>
+                                    </select></td>
+                                </tr>
+                                <tr>
                                     <td class="leftCol-small"><fmt:message key='email.template.subject'/><font
                                             color="red">*</font></td>
                                     <td><input type="text" name="emailSubject" id="emailSubject" class="text-box-big"
-                                               style="width:500px" ;/></td>
+                                               style="width:500px"/></td>
                                 </tr>
                                 <tr>
                                     <td class="leftCol-small"><fmt:message key='email.template.body'/><font color="red">*</font>

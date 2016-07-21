@@ -27,20 +27,36 @@ public class I18nMgtConstants {
     }
 
     public static final String EMAIL_TEMPLATE_PATH = "/identity/Email";
-
     public static final String EMAIL_CONF_DIRECTORY = "email";
-
     public static final String EMAIL_ADMIN_CONF_FILE = "email-admin-config.xml";
-
     public static final String EMAIL_LOCALE_SEPARATOR = ".";
-
     public static final String EMAIL_FOLDER_SEPARATOR = "/";
-
     public static final String DEFAULT_EMAIL_LOCALE = "en";
-
     public static final String EMAIL_MEDIA_TYPE = "text/plain";
 
     public static final String EMAIL_TEMPLATE_NAME = "templateName";
-    public static final String EMAIL_TEMPLATE_DISPLAY_NAME = "templateDisplayName";
+    public static final String EMAIL_TEMPLATE_TYPE_DISPLAY_NAME = "templateDisplayName";
+
+    // constants related to email template meta data properties
+    public static final String TEMPLATE_TYPE = "type";
+    public static final String TEMPLATE_TYPE_DISPLAY_NAME = "display";
+    public static final String TEMPLATE_LOCALE = "locale";
+    public static final String TEMPLATE_CONTENT_TYPE = "emailContentType";
+
+    public static final String TEMPLATE_SUBJECT = "subject";
+    public static final String TEMPLATE_BODY = "body";
+    public static final String TEMPLATE_FOOTER = "footer";
+
+
+
+    public static class ErrorMsg {
+        private ErrorMsg() {}
+
+        public static final String ERROR_GET_EMAIL_TEMPLATES =
+                "Error when retrieving email template types of %s tenant.";
+        public static final String ERROR_DUPLICATE_TEMPLATE_TYPE =
+                "Email template type %s already exists in %s tenant registry.";
+
+    }
 
 }

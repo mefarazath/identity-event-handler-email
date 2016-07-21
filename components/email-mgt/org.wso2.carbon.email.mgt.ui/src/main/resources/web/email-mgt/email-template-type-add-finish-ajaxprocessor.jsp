@@ -55,13 +55,13 @@
         return;
     }
 
-    String templateTypeName = request.getParameter("templateTypeName");
-    String templateTypeDisplayName = request.getParameter("displayName");
+//    String templateTypeName = request.getParameter("templateTypeName");
+    String templateTypeDisplayName = request.getParameter("templateDisplayName");
 
     EmailTemplateType emailTemplateType = null;
-    if (StringUtils.isNotBlank(templateTypeName) && StringUtils.isNotBlank(templateTypeDisplayName)) {
+    if (StringUtils.isNotBlank(templateTypeDisplayName)) {
         emailTemplateType = new EmailTemplateType();
-        emailTemplateType.setName(templateTypeName);
+        emailTemplateType.setName(templateTypeDisplayName.replaceAll("//s+","").toLowerCase());
         emailTemplateType.setDisplayName(templateTypeDisplayName);
     }
 
@@ -85,7 +85,7 @@
 </script>
 <%
 } catch (Exception e) {
-    CarbonUIMessage.sendCarbonUIMessage("Error while trying to add a template type : " + e.getMessage(), CarbonUIMessage.ERROR, request);
+    CarbonUIMessage.sendCarbonUIMessage("Error while trying to add the new template type : " + templateTypeDisplayName, CarbonUIMessage.ERROR, request);
 %>
 <script type="text/javascript">
     location.href = "email-template-add.jsp";

@@ -41,8 +41,7 @@ public class I18nEmailMgtConfigServiceClient {
     public I18nEmailMgtConfigServiceClient(String url,
                                            ConfigurationContext configContext) throws Exception {
         try {
-            stub = new I18NEmailMgtConfigServiceStub(configContext, url
-                    + "I18nEmailMgtConfigService");
+            stub = new I18NEmailMgtConfigServiceStub(configContext, url + "I18nEmailMgtConfigService");
         } catch (Exception e) {
             handleException(e.getMessage(), e);
         }

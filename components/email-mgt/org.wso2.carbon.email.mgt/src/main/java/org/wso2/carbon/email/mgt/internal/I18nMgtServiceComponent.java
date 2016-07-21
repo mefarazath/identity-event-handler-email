@@ -24,10 +24,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.email.mgt.config.ConfigBuilder;
-import org.wso2.carbon.email.mgt.config.ConfigType;
-import org.wso2.carbon.email.mgt.config.StorageType;
-import org.wso2.carbon.email.mgt.exceptions.I18nMgtEmailConfigException;
+import org.wso2.carbon.email.mgt.config.EmailTemplateManager;
+import org.wso2.carbon.email.mgt.config.EmailTemplateManagerImpl;
+import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtException;
 import org.wso2.carbon.identity.core.persistence.registry.RegistryResourceMgtService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.stratos.common.listeners.TenantMgtListener;
@@ -74,12 +73,11 @@ public class I18nMgtServiceComponent {
 
     private void loadEmailConfigurations() {
         //Load email template configuration on server startup.
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        ConfigBuilder configBuilder = ConfigBuilder.getInstance();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        EmailTemplateManager emailTemplateManager = new EmailTemplateManagerImpl();
         try {
-
-            configBuilder.loadDefaultConfiguration(ConfigType.EMAIL, StorageType.REGISTRY, tenantId);
-        } catch (I18nMgtEmailConfigException e) {
+            emailTemplateManager.addDefaultEmailTemplates(tenantDomain);
+        } catch (I18nEmailMgtException e) {
             log.error("Error occurred while loading default email templates", e);
         }
     }

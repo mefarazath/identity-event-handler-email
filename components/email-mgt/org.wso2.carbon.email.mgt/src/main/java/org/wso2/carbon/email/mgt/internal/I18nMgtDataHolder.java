@@ -16,7 +16,6 @@
 
 package org.wso2.carbon.email.mgt.internal;
 
-import org.wso2.carbon.email.mgt.config.EmailTemplateManager;
 import org.wso2.carbon.identity.core.persistence.registry.RegistryResourceMgtService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.user.core.service.RealmService;

@@ -16,18 +16,8 @@
 
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
-<%@ page import="org.apache.axis2.context.ConfigurationContext" %>
-<%@page import="org.owasp.encoder.Encode" %>
-<%@page import="org.wso2.carbon.CarbonConstants" %>
 <script type="text/javascript" src="../identity/validation/js/identity-validate.js"></script>
 <jsp:include page="../dialog/display_messages.jsp"/>
-
-<%@ page import="org.wso2.carbon.context.CarbonContext" %>
-<%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
-<%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
-<%@ page import="org.wso2.carbon.utils.ServerConstants" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Locale" %>
 
 
 <fmt:bundle basename="org.wso2.carbon.email.mgt.ui.i18n.Resources">
@@ -38,17 +28,23 @@
     <script type="text/javascript">
 
         function addTemplateType() {
-            var templateTypeName = document.getElementsByName("templateTypeName")[0].value;
-            var typeDisplayName = document.getElementsByName("displayName")[0].value;
+//            var templateTypeName = document.getElementsByName("templateTypeName")[0].value;
+            var typeDisplayName = document.getElementsByName("templateDisplayName")[0].value;
 
-            if (templateTypeName == null || templateTypeName == "") {
-                CARBON.showWarningDialog('Please provide the question set id');
-                location.href = '#';
-            } else if (typeDisplayName == null || typeDisplayName == "") {
+//            if (templateTypeName == null || templateTypeName == "") {
+//                CARBON.showWarningDialog('Please provide the question set id');
+//                location.href = '#';
+//            } else
+            if (typeDisplayName == null || typeDisplayName == "") {
                 CARBON.showWarningDialog('Please enter a valid security question', null, null);
                 location.href = '#';
-            }else {
-                if (!doValidateInput(document.getElementById("templateTypeName"), "Email Template Type Name is invalid. Only {1} allowed.")) {
+            } else if (typeDisplayName.length > 50) {
+                CARBON.showWarningDialog('<fmt:message key="email.template.type.is.too.long"/>');
+                return false;
+            }
+
+            else {
+                if (!doValidateInput(document.getElementById("templateDisplayName"), "Email Template Type Name is invalid. Only {1} allowed.")) {
                     location.href = '#';
                 } else {
                     $("#templateTypeForm").submit();
@@ -66,7 +62,8 @@
     <div id="middle">
         <h2><fmt:message key="email.template.type"/></h2>
 
-        <form id="templateTypeForm" name="templateTypeForm" method="post" action="email-template-type-add-finish-ajaxprocessor.jsp">
+        <form id="templateTypeForm" name="templateTypeForm" method="post"
+              action="email-template-type-add-finish-ajaxprocessor.jsp">
             <div id="workArea">
                 <table class="styledLeft">
                     <thead>
@@ -78,22 +75,23 @@
                     <tr>
                         <td class="formRow">
                             <table class="normal" cellspacing="0">
-                                <tr>
-                                    <td class="leftCol-med labelField">
-                                        <fmt:message key="email.template.type.name"/>
-                                        <span class="required">*</span>
-                                    </td>
-                                    <td class="leftCol-big">
-                                        <input name="templateTypeName" class="text-box-big" id="templateTypeName" size="100" white-list-patterns="^[a-zA-Z0-9]*$"/>
-                                    </td>
-                                </tr>
+                                    <%--<tr>--%>
+                                    <%--<td class="leftCol-med labelField">--%>
+                                    <%--<fmt:message key="email.template.type.name"/>--%>
+                                    <%--<span class="required">*</span>--%>
+                                    <%--</td>--%>
+                                    <%--<td class="leftCol-big">--%>
+                                    <%--<input name="templateTypeName" class="text-box-big" id="templateTypeName" size="100" white-list-patterns="^[a-zA-Z0-9]*$"/>--%>
+                                    <%--</td>--%>
+                                    <%--</tr>--%>
                                 <tr>
                                     <td class="leftCol-med labelField">
                                         <fmt:message key="email.template.type.display.name"/>
                                         <span class="required">*</span>
                                     </td>
                                     <td class="leftCol-big">
-                                        <input size="70" name="displayName" id="displayName" class="text-box-big" white-list-patterns="^[a-zA-Z0-9]*$"/>
+                                        <input size="50" name="templateDisplayName" id="templateDisplayName" class="text-box-big"
+                                               white-list-patterns="^[a-zA-Z0-9\s]+$"/>
                                     </td>
                                 </tr>
                                 <tr>
