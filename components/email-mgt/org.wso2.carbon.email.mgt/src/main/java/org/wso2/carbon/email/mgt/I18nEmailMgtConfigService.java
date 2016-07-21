@@ -21,20 +21,13 @@ package org.wso2.carbon.email.mgt;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.email.mgt.config.ConfigBuilder;
-import org.wso2.carbon.email.mgt.config.EmailConfigTransformer;
-import org.wso2.carbon.email.mgt.config.EmailNotificationConfig;
 import org.wso2.carbon.email.mgt.config.EmailTemplateManagerImpl;
-import org.wso2.carbon.email.mgt.config.StorageType;
 import org.wso2.carbon.email.mgt.dto.EmailTemplateDTO;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtException;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtServerException;
-import org.wso2.carbon.email.mgt.exceptions.I18nMgtEmailConfigException;
 import org.wso2.carbon.email.mgt.model.EmailTemplateType;
-import org.wso2.carbon.identity.base.IdentityException;
 
 import java.util.List;
-import java.util.Properties;
 
 /**
  * This service provides functionality for managing internationalized email templates used for notifications across the
@@ -50,13 +43,13 @@ public class I18nEmailMgtConfigService {
      * @throws I18nEmailMgtServerException
      */
     public void addEmailTemplateType(EmailTemplateType emailTemplateType) throws I18nEmailMgtServerException {
+
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
             templateManager.addEmailTemplateType(emailTemplateType, tenantDomain);
         } catch (I18nEmailMgtException e) {
             String errorMsg = String.format("Error while adding email template type to %s tenant.", tenantDomain);
-            log.error(errorMsg, e);
-            throw new I18nEmailMgtServerException(errorMsg, e);
+            handleException(errorMsg, e);
         }
     }
 
@@ -65,15 +58,17 @@ public class I18nEmailMgtConfigService {
      * @throws I18nEmailMgtServerException
      */
     public EmailTemplateType[] getEmailTemplateTypes() throws I18nEmailMgtServerException {
+
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
             List<EmailTemplateType> emailTemplateTypes = templateManager.getAvailableTemplateTypes(tenantDomain);
             return emailTemplateTypes.toArray(new EmailTemplateType[emailTemplateTypes.size()]);
         } catch (I18nEmailMgtException e) {
             String errorMsg = String.format("Error while retrieving email template types of %s tenant.", tenantDomain);
-            log.error(errorMsg, e);
-            throw new I18nEmailMgtServerException(errorMsg, e);
+            handleException(errorMsg, e);
         }
+
+        return new EmailTemplateType[0];
     }
 
     /**
@@ -84,20 +79,12 @@ public class I18nEmailMgtConfigService {
      */
     public void saveEmailConfig(EmailTemplateDTO emailTemplate) throws I18nEmailMgtServerException {
 
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        EmailNotificationConfig emailConfig = new EmailNotificationConfig();
-        ConfigBuilder configBuilder = ConfigBuilder.getInstance();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
-            Properties props = EmailConfigTransformer.transform(emailTemplate);
-            emailConfig.setProperties(props);
-            configBuilder.saveConfiguration(StorageType.REGISTRY, tenantId, emailConfig);
-        } catch (IdentityException e) {
-            log.error("Error occurred while transforming to Email Template Object ", e);
-            throw new I18nEmailMgtServerException("Error occurred while saving email template configurations", e);
-        } catch (I18nMgtEmailConfigException e) {
-            log.error("Error occurred while saving email template configuration", e);
-            throw new I18nEmailMgtServerException("Error occurred while writing email template configurations to " +
-                    "registry path", e);
+            templateManager.addEmailTemplate(emailTemplate, tenantDomain);
+        } catch (I18nEmailMgtException e) {
+            String error = "Error occurred while updating email template in " + tenantDomain + "registry.";
+            handleException(error, e);
         }
     }
 
@@ -113,8 +100,8 @@ public class I18nEmailMgtConfigService {
         try {
             templateManager.addEmailTemplate(emailTemplate, tenantDomain);
         } catch (I18nEmailMgtException e) {
-            log.error("Error occurred while adding email template to " + tenantDomain + " tenant registry", e);
-            throw new I18nEmailMgtServerException("Error occurred adding an email template", e);
+            String errorMsg = "Error occurred while adding email template to " + tenantDomain + " tenant registry";
+            handleException(errorMsg, e);
         }
     }
 
@@ -133,20 +120,40 @@ public class I18nEmailMgtConfigService {
             templates = templateDTOs.toArray(new EmailTemplateDTO[templateDTOs.size()]);
         } catch (I18nEmailMgtException e) {
             String errorMsg = "Error occurred while retrieving email templates of " + tenantDomain + " tenant.";
-            log.error(errorMsg, e);
-            throw new I18nEmailMgtServerException(errorMsg, e);
+            handleException(errorMsg, e);
         }
 
         return templates;
     }
 
 
-    public void deleteEmailTemplateType(String emailTemplateType) {
+    public void deleteEmailTemplateType(String emailTemplateType) throws I18nEmailMgtServerException {
 
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        try {
+            templateManager.deleteEmailTemplateType(emailTemplateType, tenantDomain);
+        } catch (I18nEmailMgtException e) {
+            String errorMsg = "Error occurred while deleting email template type '" + emailTemplateType + "' of " +
+                    tenantDomain + " tenant.";
+            handleException(errorMsg, e);
+        }
     }
 
 
-    public void deleteEmailTemplate(String templateTypeType, String locale) {
+    public void deleteEmailTemplate(String templateType, String locale) throws I18nEmailMgtServerException {
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        try {
+            templateManager.deleteEmailTemplate(templateType, locale, tenantDomain);
+        } catch (I18nEmailMgtException e) {
+            String errorMsg = "Error occurred while deleting email template type '" + templateType + "' of locale '"
+                    + locale + "' in " + tenantDomain + " tenant registry.";
+            handleException(errorMsg, e);
+        }
 
+    }
+
+    private void handleException(String errorMessage, I18nEmailMgtException e) throws I18nEmailMgtServerException {
+        log.error(errorMessage, e);
+        throw new I18nEmailMgtServerException(errorMessage, e);
     }
 }

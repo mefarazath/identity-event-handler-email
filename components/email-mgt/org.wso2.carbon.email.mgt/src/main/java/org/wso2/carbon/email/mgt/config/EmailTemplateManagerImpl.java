@@ -190,27 +190,26 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
     }
 
     @Override
-    public void deleteEmailTemplate(EmailTemplateDTO templateDTO, String tenantDomain) throws
+    public void deleteEmailTemplate(String templateTypeName, String localeCode, String tenantDomain) throws
             I18nEmailMgtException {
-        String displayName = templateDTO.getDisplayName();
-        String locale = templateDTO.getLocale();
+        // validate the name and locale code. TOD
 
-        if (StringUtils.isBlank(displayName)) {
+        if (StringUtils.isBlank(templateTypeName)) {
             throw new I18nEmailMgtClientException("Email displayName cannot be null.");
         }
 
-        if (StringUtils.isBlank(locale)) {
+        if (StringUtils.isBlank(localeCode)) {
             throw new I18nEmailMgtClientException("Email locale cannot be null.");
         }
 
-        String templateType = Util.getNormalizedName(displayName);
+        String templateType = Util.getNormalizedName(templateTypeName);
         String path = TEMPLATE_BASE_PATH + PATH_SEPARATOR + templateType;
 
         try {
-            resourceMgtService.deleteIdentityResource(path, tenantDomain, locale);
+            resourceMgtService.deleteIdentityResource(path, tenantDomain, localeCode);
         } catch (IdentityRuntimeException ex) {
-            String msg = String.format("Error deleting %s:%s template from %s tenant registry.", displayName, locale,
-                    tenantDomain);
+            String msg = String.format("Error deleting %s:%s template from %s tenant registry.", templateTypeName,
+                    localeCode, tenantDomain);
             throw new I18nEmailMgtServerException(msg);
         }
     }

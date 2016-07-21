@@ -39,7 +39,7 @@ public interface EmailTemplateManager {
 
     void updateEmailTemplate(EmailTemplateDTO templateDTO, String tenantDomain) throws I18nEmailMgtException;
 
-    void deleteEmailTemplate(EmailTemplateDTO templateDTO, String tenantDomain) throws I18nEmailMgtException;
+    void deleteEmailTemplate(String templateTypeName, String localeCode, String tenantDomain) throws I18nEmailMgtException;
 
     void addDefaultEmailTemplates(String tenantDomain) throws I18nEmailMgtException;
 
