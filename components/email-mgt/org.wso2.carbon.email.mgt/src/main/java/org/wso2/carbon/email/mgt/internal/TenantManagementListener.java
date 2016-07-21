@@ -20,12 +20,8 @@ package org.wso2.carbon.email.mgt.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.email.mgt.config.ConfigBuilder;
-import org.wso2.carbon.email.mgt.config.ConfigType;
 import org.wso2.carbon.email.mgt.config.EmailTemplateManager;
 import org.wso2.carbon.email.mgt.config.EmailTemplateManagerImpl;
-import org.wso2.carbon.email.mgt.config.StorageType;
-import org.wso2.carbon.email.mgt.exceptions.I18nMgtEmailConfigException;
 import org.wso2.carbon.stratos.common.beans.TenantInfoBean;
 import org.wso2.carbon.stratos.common.exception.StratosException;
 import org.wso2.carbon.stratos.common.listeners.TenantMgtListener;

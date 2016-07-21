@@ -54,11 +54,11 @@ public class Util {
     private Util() {
     }
 
-    public static String getNormalizedName(String name) throws I18nEmailMgtException {
-        if (StringUtils.isNotBlank(name)) {
-            return name.replaceAll("\\s+", "").toLowerCase();
+    public static String getNormalizedName(String templateTypeName) throws I18nEmailMgtException {
+        if (StringUtils.isNotBlank(templateTypeName)) {
+            return templateTypeName.replaceAll("\\s+", "").toLowerCase();
         }
-        throw new I18nEmailMgtException("Invalid String provided to normalize : " + name);
+        throw new I18nEmailMgtException("Invalid template type name provided : " + templateTypeName);
     }
 
     public static List<EmailTemplateDTO> getDefaultEmailTemplates() {

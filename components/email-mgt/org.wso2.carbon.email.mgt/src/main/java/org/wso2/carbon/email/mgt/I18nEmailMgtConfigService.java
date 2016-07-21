@@ -83,7 +83,7 @@ public class I18nEmailMgtConfigService {
         try {
             templateManager.addEmailTemplate(emailTemplate, tenantDomain);
         } catch (I18nEmailMgtException e) {
-            String error = "Error occurred while updating email template in " + tenantDomain + "registry.";
+            String error = "Error occurred while updating email template in " + tenantDomain + " tenant registry.";
             handleException(error, e);
         }
     }

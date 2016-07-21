@@ -43,12 +43,6 @@
 <%@ page import="org.wso2.carbon.email.mgt.ui.Util" %>
 
 <%
-    String localeParam = request.getParameter("locale");
-
-    if (StringUtils.isBlank(localeParam)) {
-        localeParam = "English (United States)";
-    }
-
     String templateType = request.getParameter("templateType");
 
     String username = request.getParameter("username");
@@ -250,11 +244,12 @@
                                         templateName = template.getName();
                                         emailContentType = template.getEmailContentType();
 
-                                        String localeDisplayName = Util.getLocaleDisplayName(template.getLocale());
+                                        String localeCode = template.getLocale();
+                                        String localeDisplayName = Util.getLocaleDisplayName(localeCode);
 
                                 %>
                                 <option
-                                        value="<%=i%>"
+                                        value="<%=localeCode%>"
                                         data-subject="<%=Encode.forHtmlAttribute(emailSubject)%>"
                                         data-body="<%=Encode.forHtmlAttribute(emailBody)%>"
                                         data-footer="<%=Encode.forHtmlAttribute(emailFooter)%>"

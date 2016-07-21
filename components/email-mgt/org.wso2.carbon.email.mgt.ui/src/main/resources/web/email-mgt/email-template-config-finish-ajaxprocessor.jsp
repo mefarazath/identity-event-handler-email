@@ -39,17 +39,21 @@
         return;
     }
 
+    String templateDisplayName = request.getParameter("emailTypes");
+    String emailContentType =request.getParameter("emailContentType");
+    String emailLocaleCode = request.getParameter("emailLanguage");
+
     String emailSubject = request.getParameter("emailSubject");
     String emailBody = request.getParameter("emailBody");
     String emailFooter = request.getParameter("emailFooter");
-    String templateName = request.getParameter("templateName");
-    String emailContentType =request.getParameter("emailContentType");
 
-    String templateFinalName = templateName + "." + emailContentType;
-
-    EmailConfigDTO emailConfig = null;
     EmailTemplateDTO templateChanged = new EmailTemplateDTO();
-
+    if (StringUtils.isNotBlank(templateDisplayName)) {
+        templateChanged.setDisplayName(templateDisplayName);
+    }
+    if (StringUtils.isNotBlank(emailLocaleCode)) {
+        templateChanged.setLocale(emailLocaleCode);
+    }
     if (StringUtils.isNotBlank(emailSubject)) {
         templateChanged.setSubject(emailSubject);
     }
@@ -58,9 +62,6 @@
     }
     if (StringUtils.isNotBlank(emailFooter)) {
         templateChanged.setFooter(emailFooter);
-    }
-    if (StringUtils.isNotBlank(templateFinalName)) {
-        templateChanged.setName(templateFinalName);
     }
     if (StringUtils.isNotBlank(emailContentType)) {
         templateChanged.setEmailContentType(emailContentType);
@@ -77,6 +78,7 @@
         I18nEmailMgtConfigServiceClient configClient =
                 new I18nEmailMgtConfigServiceClient(cookie, backendServerURL, configContext);
         configClient.saveEmailConfig(templateChanged);
+        CarbonUIMessage.sendCarbonUIMessage("Email Template successfully Saved.", CarbonUIMessage.INFO, request);
 %>
 <script type="text/javascript">
     location.href = "email-template-config.jsp";
