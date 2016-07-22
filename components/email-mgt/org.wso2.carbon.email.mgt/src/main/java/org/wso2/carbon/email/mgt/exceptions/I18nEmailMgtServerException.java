@@ -23,7 +23,7 @@ package org.wso2.carbon.email.mgt.exceptions;
  */
 public class I18nEmailMgtServerException extends I18nEmailMgtException {
     
-    private static final long serialVersionUID = -7830262138811733180L;
+    private static final long serialVersionUID = -7830262138811733190L;
 
     public I18nEmailMgtServerException(String message) {
 		super(message);

@@ -22,8 +22,15 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Util class for UI component
+ */
 public class Util {
 
+    /**
+     * Map to store locale_code --> locale display name
+     * eg : en_US --> English (United States)
+     */
     private static Map<String, String> localeCodeMap;
 
     static {
@@ -38,7 +45,13 @@ public class Util {
         }
     }
 
-
+    /**
+     * Get the locale code string for a locale object, locale code is in the form languageCode_countryCode
+     * for example : en_US
+     *
+     * @param locale Locale object.
+     * @return locale code string.
+     */
     public static String getLocaleCode(Locale locale) {
         String languageCode = locale.getLanguage();
         String countryCode = locale.getCountry();
@@ -51,6 +64,13 @@ public class Util {
         return null;
     }
 
+    /**
+     * Get locale display name given a locale code string.
+     * ex: when en_US given we
+     *
+     * @param localeCode String in the format of [languageCode]_[countryCode] like en_US.
+     * @return locale display name string
+     */
     public static String getLocaleDisplayName(String localeCode) {
         if (StringUtils.isBlank(localeCode)) {
             return null;

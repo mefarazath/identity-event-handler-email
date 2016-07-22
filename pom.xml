@@ -335,8 +335,7 @@
     <properties>
         <!--Identity Event Handler Email Version-->
         <identity.event.handler.email.exp.pkg.version>1.0.0-SNAPSHOT</identity.event.handler.email.exp.pkg.version>
-        <identity.event.handler.email.imp.pkg.version.range>[1.0.0, 2.0.0)
-        </identity.event.handler.email.imp.pkg.version.range>
+        <identity.event.handler.email.imp.pkg.version.range>[1.0.0, 2.0.0)</identity.event.handler.email.imp.pkg.version.range>
 
         <osgi.framework.imp.pkg.version.range>[1.7.0, 2.0.0)</osgi.framework.imp.pkg.version.range>
         <osgi.service.component.imp.pkg.version.range>[1.2.0, 2.0.0)</osgi.service.component.imp.pkg.version.range>
@@ -366,8 +365,7 @@
 
         <!--Carbon Identity Framework Version-->
         <carbon.identity.framework.version>5.5.0-SNAPSHOT</carbon.identity.framework.version>
-        <carbon.identity.framework.imp.pkg.version.range>[5.0.0, 6.0.0)
-        </carbon.identity.framework.imp.pkg.version.range>
+        <carbon.identity.framework.imp.pkg.version.range>[5.0.0, 6.0.0)</carbon.identity.framework.imp.pkg.version.range>
 
         <!--Identity Governance Version-->
         <identity.governance.imp.pkg.version.range>[1.0.0, 2.0.0)</identity.governance.imp.pkg.version.range>

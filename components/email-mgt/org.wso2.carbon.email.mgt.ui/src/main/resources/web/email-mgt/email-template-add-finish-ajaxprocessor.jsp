@@ -22,7 +22,7 @@
 <jsp:include page="../dialog/display_messages.jsp"/>
 <%@page import="org.apache.commons.lang.StringUtils" %>
 <%@page import="org.wso2.carbon.CarbonConstants" %>
-<%@ page import="org.wso2.carbon.email.mgt.dto.xsd.EmailTemplateDTO" %>
+<%@ page import="org.wso2.carbon.email.mgt.model.xsd.EmailTemplate" %>
 <%@ page import="org.wso2.carbon.email.mgt.ui.I18nEmailMgtConfigServiceClient" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
@@ -45,7 +45,7 @@
     String emailBody = request.getParameter("emailBody");
     String emailFooter = request.getParameter("emailFooter");
 
-    EmailTemplateDTO templateAdded = new EmailTemplateDTO();
+    EmailTemplate templateAdded = new EmailTemplate();
     if (StringUtils.isNotBlank(emailTypeDisplayName)) {
         templateAdded.setDisplayName(emailTypeDisplayName);
     }

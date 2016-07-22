@@ -75,7 +75,8 @@
                                         <span class="required">*</span>
                                     </td>
                                     <td class="leftCol-big">
-                                        <input size="50" name="templateDisplayName" id="templateDisplayName" class="text-box-big"
+                                        <input size="50" name="templateDisplayName" id="templateDisplayName"
+                                               class="text-box-big"
                                                white-list-patterns="^[a-zA-Z0-9\s]+$"/>
                                     </td>
                                 </tr>

@@ -25,7 +25,7 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.email.mgt.dto.xsd.EmailTemplateDTO;
+import org.wso2.carbon.email.mgt.model.xsd.EmailTemplate;
 import org.wso2.carbon.email.mgt.model.xsd.EmailTemplateType;
 import org.wso2.carbon.email.mgt.stub.I18NEmailMgtConfigServiceStub;
 
@@ -68,7 +68,7 @@ public class I18nEmailMgtConfigServiceClient {
     }
 
     /**
-     * Add a template type for a tenant.
+     * Add an email template type for a tenant. (eg; Account Recovery)
      *
      * @param emailTemplateType
      * @throws AxisFault
@@ -103,7 +103,7 @@ public class I18nEmailMgtConfigServiceClient {
      * @param emailTemplate <code>Email Template</code> new Email Template information
      * @throws Exception Error when saving the Email Template.
      */
-    public void saveEmailConfig(EmailTemplateDTO emailTemplate) throws AxisFault {
+    public void saveEmailConfig(EmailTemplate emailTemplate) throws AxisFault {
         try {
             stub.saveEmailConfig(emailTemplate);
         } catch (Exception e) {
@@ -117,7 +117,7 @@ public class I18nEmailMgtConfigServiceClient {
      * @param emailTemplate <code>Email Template</code> new Email Template information
      * @throws Exception Error when adding new Email Template information
      */
-    public void addEmailConfig(EmailTemplateDTO emailTemplate) throws AxisFault {
+    public void addEmailConfig(EmailTemplate emailTemplate) throws AxisFault {
         try {
             stub.addEmailConfig(emailTemplate);
         } catch (Exception e) {
@@ -130,16 +130,23 @@ public class I18nEmailMgtConfigServiceClient {
      *
      * @throws Exception Error when loading Email Template information
      */
-    public EmailTemplateDTO[] loadEmailTemplates() throws AxisFault {
+    public EmailTemplate[] loadEmailTemplates() throws AxisFault {
         try {
             return stub.getEmailConfig();
         } catch (Exception e) {
             handleException(e.getMessage(), e);
         }
 
-        return new EmailTemplateDTO[0];
+        return new EmailTemplate[0];
     }
 
+    /**
+     * Delete an email template from a tenant's registry.
+     *
+     * @param templateType
+     * @param localeCode
+     * @throws AxisFault
+     */
     public void deleteEmailTemplate(String templateType, String localeCode) throws AxisFault {
         try {
             stub.deleteEmailTemplate(templateType, localeCode);
@@ -148,6 +155,13 @@ public class I18nEmailMgtConfigServiceClient {
         }
     }
 
+    /**
+     * Delete all templates of a template type from a tenant's registry. This will remove all the email templates for
+     * a particular scenario in different locales.
+     *
+     * @param templateType
+     * @throws AxisFault
+     */
     public void deleteEmailTemplateType(String templateType) throws AxisFault {
         try {
             stub.deleteEmailTemplateType(templateType);

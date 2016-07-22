@@ -22,7 +22,7 @@
 <jsp:include page="../dialog/display_messages.jsp"/>
 <%@page import="org.apache.commons.lang.StringUtils" %>
 <%@page import="org.wso2.carbon.CarbonConstants" %>
-<%@ page import="org.wso2.carbon.email.mgt.dto.xsd.EmailTemplateDTO" %>
+<%@ page import="org.wso2.carbon.email.mgt.model.xsd.EmailTemplate" %>
 <%@ page import="org.wso2.carbon.email.mgt.ui.I18nEmailMgtConfigServiceClient" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
@@ -55,7 +55,7 @@
     String templateTypeToDelete = request.getParameter("templateName");
     String locale = request.getParameter("locale");
 
-    EmailTemplateDTO templateChanged = new EmailTemplateDTO();
+    EmailTemplate templateChanged = new EmailTemplate();
     if (!deleteTemplate) {
         if (StringUtils.isNotBlank(templateDisplayName)) {
             templateChanged.setDisplayName(templateDisplayName);

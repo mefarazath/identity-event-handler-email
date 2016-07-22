@@ -25,12 +25,12 @@
 <%@page import="org.apache.commons.lang.StringUtils" %>
 <%@page import="org.owasp.encoder.Encode" %>
 <%@page import="org.wso2.carbon.CarbonConstants" %>
-<%@page import="org.wso2.carbon.email.mgt.dto.xsd.EmailTemplateDTO" %>
 <script type="text/javascript" src="extensions/js/vui.js"></script>
 <script type="text/javascript" src="../extensions/core/js/vui.js"></script>
 <script type="text/javascript" src="../admin/js/main.js"></script>
 
 <jsp:include page="../dialog/display_messages.jsp"/>
+<%@ page import="org.wso2.carbon.email.mgt.model.xsd.EmailTemplate" %>
 <%@ page import="org.wso2.carbon.email.mgt.ui.I18nEmailMgtConfigServiceClient" %>
 <%@ page import="org.wso2.carbon.email.mgt.ui.Util" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
@@ -47,7 +47,7 @@
     String forwardTo = null;
     I18nEmailMgtConfigServiceClient client = null;
 
-    EmailTemplateDTO[] emailTemplates = null;
+    EmailTemplate[] emailTemplates = null;
     String emailSubject = "";
     String emailBody = "";
     String emailFooter = "";
@@ -83,7 +83,7 @@
         // get template types
         emailTemplates = client.loadEmailTemplates();
         if (emailTemplates == null) {
-            emailTemplates = new EmailTemplateDTO[0];
+            emailTemplates = new EmailTemplate[0];
         }
 
     } catch (Exception e) {
@@ -221,7 +221,7 @@
         </h2>
 
         <div id="workArea">
-            <% if(ArrayUtils.isNotEmpty(emailTemplates)) {%>
+            <% if (ArrayUtils.isNotEmpty(emailTemplates)) {%>
 
             <form name="templateForm" action="email-template-config-finish-ajaxprocessor.jsp" method="post">
                 <div class="sectionSeperator">
@@ -234,9 +234,8 @@
                             <td><select id="emailTypes" name="emailTypes" class="leftCol-med"
                                         onchange="updateLocale(this);">
                                 <%
-                                    for (EmailTemplateDTO emailTemplate : emailTemplates) {
-                                        System.out.println("API AWAAAAAAAAAA  : " + emailTemplates.length);
-                                        String displayName = emailTemplate.getDisplayName();
+                                    for (EmailTemplate emailTemplate : emailTemplates) {
+\                                        String displayName = emailTemplate.getDisplayName();
                                         String selected = StringUtils.equalsIgnoreCase(templateType, displayName) ? "selected" : "";
                                 %>
                                 <option value="<%=displayName%>" <%=selected%>>
@@ -247,7 +246,6 @@
 
                                     if (StringUtils.isBlank(templateType)) {
                                         if (ArrayUtils.isNotEmpty(emailTemplates)) {
-                                            System.out.println("API AWAAAAAAAAAA  : " + emailTemplates.length);
                                             templateType = emailTemplates[0].getDisplayName();
                                         }
                                     }
@@ -260,16 +258,15 @@
                             <td><select id="emailLanguage" name="emailLanguage" class="leftCol-med"
                                         onchange="updateFields(this)">
                                 <%
-                                    List<EmailTemplateDTO> templatesList = new ArrayList<EmailTemplateDTO>();
-                                    for (EmailTemplateDTO template : emailTemplates) {
-                                        System.out.println("TEMPLATES : " + emailTemplates.length);
+                                    List<EmailTemplate> templatesList = new ArrayList<EmailTemplate>();
+                                    for (EmailTemplate template : emailTemplates) {
                                         if (template.getDisplayName().equalsIgnoreCase(templateType)) {
                                             templatesList.add(template);
                                         }
                                     }
 
                                     for (int i = 0; i < templatesList.size(); i++) {
-                                        EmailTemplateDTO template = templatesList.get(i);
+                                        EmailTemplate template = templatesList.get(i);
                                         if (i == 0) {
                                             emailSubject0 = template.getSubject();
                                             emailBody0 = template.getBody();
