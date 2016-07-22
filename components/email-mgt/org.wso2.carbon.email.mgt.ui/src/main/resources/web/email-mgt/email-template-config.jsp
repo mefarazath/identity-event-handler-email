@@ -31,16 +31,14 @@
 <script type="text/javascript" src="../admin/js/main.js"></script>
 
 <jsp:include page="../dialog/display_messages.jsp"/>
-<%@ page import="org.wso2.carbon.email.mgt.model.xsd.EmailTemplateType" %>
-<%@ page import="org.wso2.carbon.email.mgt.ui.EmailConfigDTO" %>
 <%@ page import="org.wso2.carbon.email.mgt.ui.I18nEmailMgtConfigServiceClient" %>
+<%@ page import="org.wso2.carbon.email.mgt.ui.Util" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ResourceBundle" %>
-<%@ page import="org.wso2.carbon.email.mgt.ui.Util" %>
 
 <%
     String templateType = request.getParameter("templateType");
@@ -49,7 +47,7 @@
     String forwardTo = null;
     I18nEmailMgtConfigServiceClient client = null;
 
-    EmailConfigDTO emailConfig = null;
+    EmailTemplateDTO[] emailTemplates = null;
     String emailSubject = "";
     String emailBody = "";
     String emailFooter = "";
@@ -71,7 +69,6 @@
     String BUNDLE = "org.wso2.carbon.email.mgt.ui.i18n.Resources";
     ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE, request.getLocale());
 
-    EmailTemplateType[] emailTemplateTypes = null;
     try {
         String cookie = (String) session
                 .getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
@@ -84,7 +81,10 @@
                 backendServerURL, configContext);
 
         // get template types
-        emailConfig = client.loadEmailConfig();
+        emailTemplates = client.loadEmailTemplates();
+        if (emailTemplates == null) {
+            emailTemplates = new EmailTemplateDTO[0];
+        }
 
     } catch (Exception e) {
         String message = resourceBundle
@@ -94,6 +94,30 @@
     }
 %>
 <script type="text/javascript">
+
+    function validate() {
+        var value = document.getElementsByName("emailSubject")[0].value;
+        if (value == '') {
+            CARBON.showWarningDialog('<fmt:message key="email.template.subject.is.required"/>');
+            return false;
+        } else if (value.length > 50) {
+            CARBON.showWarningDialog('<fmt:message key="email.template.subject.is.too.long"/>');
+            return false;
+        }
+
+        var value = document.getElementsByName("emailBody")[0].value;
+        if (value == '') {
+            CARBON.showWarningDialog('<fmt:message key="email.template.body.is.required"/>');
+            return false;
+        }
+
+        var value = document.getElementsByName("emailFooter")[0].value;
+        if (value == '') {
+            CARBON.showWarningDialog('<fmt:message key="email.template.footer.is.required"/>');
+            return false;
+        }
+        document.templateForm.submit();
+    }
 
     function updateFields(elm) {
         var $selectedOption = jQuery(elm).find(":selected");
@@ -114,36 +138,52 @@
         }).appendTo(document.body).submit();
     }
 
-    function doDelete(templateName, locale) {
-        $.ajax({
-            type: 'POST',
-            url: 'email-template-config-finish-ajaxprocessor.jsp',
-            headers: {
-                Accept: "text/html"
-            },
-            data: {'templateName=': templateName, 'locale': locale},
-            async: false,
-            success: function (responseText, status) {
-                if (status == "success") {
-                    location.assign("email-template-config.jsp");
-                }
-            }
-        });
-    }
-
     function deleteTemplate() {
         var templateName = document.getElementsByName("emailTypes")[0].value;
         var locale = document.getElementsByName("emailLanguage")[0].value;
-        var msg = "Are you sure you want to delete {0}:{1} email template?";
+
+        var deleteFunc = function doDelete() {
+            $.ajax({
+                type: 'POST',
+                url: 'email-template-config-finish-ajaxprocessor.jsp',
+                headers: {
+                    Accept: "text/html"
+                },
+                data: {'delete': true, 'templateName': templateName, 'locale': locale},
+                async: false,
+                success: function (responseText, status) {
+                    if (status == "success") {
+                        location.assign("email-template-config.jsp");
+                    }
+                }
+            });
+        }
+        var msg = "This will delete {0}:{1} email template. Are you sure you want to continue?";
         msg = msg.replace("{0}", templateName).replace("{1}", locale);
-        CARBON.showConfirmationDialog( msg , doDelete(templateName, locale), null);
+        CARBON.showConfirmationDialog(msg, deleteFunc, null, null);
     }
 
 
     function deleteTemplateType() {
         var templateName = document.getElementsByName("emailTypes")[0].value;
+        var deleteFunc = function doDelete() {
+            $.ajax({
+                type: 'POST',
+                url: 'email-template-config-finish-ajaxprocessor.jsp',
+                headers: {
+                    Accept: "text/html"
+                },
+                data: {'delete': true, 'templateName': templateName, 'locale': "ALL"},
+                async: false,
+                success: function (responseText, status) {
+                    if (status == "success") {
+                        location.assign("email-template-config.jsp");
+                    }
+                }
+            });
+        }
         var msg = "This will delete all email templates of type {0}. Are you sure you want to continue?";
-        CARBON.showConfirmationDialog( msg.replace("{0}", templateName), doDelete(templateName, "ALL"), null);
+        CARBON.showConfirmationDialog(msg.replace("{0}", templateName), deleteFunc, null);
     }
 
 </script>
@@ -181,7 +221,9 @@
         </h2>
 
         <div id="workArea">
-            <form action="email-template-config-finish-ajaxprocessor.jsp?userName=<%=username%>" method="post">
+            <% if(ArrayUtils.isNotEmpty(emailTemplates)) {%>
+
+            <form name="templateForm" action="email-template-config-finish-ajaxprocessor.jsp" method="post">
                 <div class="sectionSeperator">
                     <fmt:message key="email.template.set"/>
                 </div>
@@ -192,8 +234,8 @@
                             <td><select id="emailTypes" name="emailTypes" class="leftCol-med"
                                         onchange="updateLocale(this);">
                                 <%
-                                    EmailTemplateDTO[] emailTemplateDTOs = emailConfig.getTemplates();
-                                    for (EmailTemplateDTO emailTemplate : emailTemplateDTOs) {
+                                    for (EmailTemplateDTO emailTemplate : emailTemplates) {
+                                        System.out.println("API AWAAAAAAAAAA  : " + emailTemplates.length);
                                         String displayName = emailTemplate.getDisplayName();
                                         String selected = StringUtils.equalsIgnoreCase(templateType, displayName) ? "selected" : "";
                                 %>
@@ -204,8 +246,9 @@
                                     }
 
                                     if (StringUtils.isBlank(templateType)) {
-                                        if (ArrayUtils.isNotEmpty(emailTemplateDTOs)) {
-                                            templateType = emailTemplateDTOs[0].getDisplayName();
+                                        if (ArrayUtils.isNotEmpty(emailTemplates)) {
+                                            System.out.println("API AWAAAAAAAAAA  : " + emailTemplates.length);
+                                            templateType = emailTemplates[0].getDisplayName();
                                         }
                                     }
                                 %>
@@ -217,19 +260,16 @@
                             <td><select id="emailLanguage" name="emailLanguage" class="leftCol-med"
                                         onchange="updateFields(this)">
                                 <%
-                                    EmailTemplateDTO[] templates = emailConfig.getTemplates();
-
                                     List<EmailTemplateDTO> templatesList = new ArrayList<EmailTemplateDTO>();
-                                    for (EmailTemplateDTO template : templates) {
+                                    for (EmailTemplateDTO template : emailTemplates) {
+                                        System.out.println("TEMPLATES : " + emailTemplates.length);
                                         if (template.getDisplayName().equalsIgnoreCase(templateType)) {
                                             templatesList.add(template);
                                         }
                                     }
 
                                     for (int i = 0; i < templatesList.size(); i++) {
-
                                         EmailTemplateDTO template = templatesList.get(i);
-
                                         if (i == 0) {
                                             emailSubject0 = template.getSubject();
                                             emailBody0 = template.getBody();
@@ -300,18 +340,22 @@
                             </textarea></td>
                         </tr>
                         <tr>
-                            <td></td>
                             <td><input type="hidden" name="templateName" id="templateName"
                                        value="<%=Encode.forHtmlAttribute(templateName0)%>"/></td>
                         </tr>
                     </table>
                 </div>
                 <div class="buttonRow">
-                    <input type="submit" class="button" value="Save"/>
-                    <input type="submit" class="button" value="Delete Template" onclick=""/>
-                    <input type="submit" class="button" value="Delete Template Type" onclick=""/>
+                    <input type="button" class="button" value="Save" onclick="validate()"/>
+                    <input type="button" class="button" value="Delete Template" onclick="deleteTemplate()"/>
+                    <input type="button" class="button" value="Delete Template Type" onclick="deleteTemplateType()"/>
                 </div>
             </form>
+            <%} else {%>
+            <div class="buttonRow">
+                <fmt:message key="email.templates.empty"/>
+            </div>
+            <%}%>
         </div>
     </div>
 </fmt:bundle>

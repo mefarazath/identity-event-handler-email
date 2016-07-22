@@ -197,10 +197,12 @@ public class Util {
 
                 String[] templateContentElements = StringUtils.split(templateContent, "|");
                 // TODO should find a better way to maintain sections of email template.
-                if (templateContentElements.length != 3) {
-                    String errorMsg = String.format(
-                            "Template %s:%s contains '|' character which is invalid.", templateDisplayName, locale);
-                    throw new I18nMgtEmailConfigException(errorMsg);
+                if (templateContentElements.length > 3) {
+                    String errorMsg = "Template %s:%s contains '|' character which is invalid.";
+                    throw new I18nMgtEmailConfigException(String.format(errorMsg, templateDisplayName, locale));
+                } else if (templateContentElements.length < 3) {
+                    String errorMsg = "Template %s:%s contains empty body content.";
+                    throw new I18nMgtEmailConfigException(String.format(errorMsg, templateDisplayName, locale));
                 }
 
                 templateDTO.setSubject(templateContentElements[0]);

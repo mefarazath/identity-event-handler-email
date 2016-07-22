@@ -28,13 +28,7 @@
     <script type="text/javascript">
 
         function addTemplateType() {
-//            var templateTypeName = document.getElementsByName("templateTypeName")[0].value;
             var typeDisplayName = document.getElementsByName("templateDisplayName")[0].value;
-
-//            if (templateTypeName == null || templateTypeName == "") {
-//                CARBON.showWarningDialog('Please provide the question set id');
-//                location.href = '#';
-//            } else
             if (typeDisplayName == null || typeDisplayName == "") {
                 CARBON.showWarningDialog('Please enter a valid security question', null, null);
                 location.href = '#';
@@ -54,7 +48,7 @@
         }
 
         function cancelForm() {
-            location.href = 'challenges-mgt-add.jsp';
+            location.href = 'email-template-type-add.jsp';
         }
 
     </script>
@@ -75,15 +69,6 @@
                     <tr>
                         <td class="formRow">
                             <table class="normal" cellspacing="0">
-                                    <%--<tr>--%>
-                                    <%--<td class="leftCol-med labelField">--%>
-                                    <%--<fmt:message key="email.template.type.name"/>--%>
-                                    <%--<span class="required">*</span>--%>
-                                    <%--</td>--%>
-                                    <%--<td class="leftCol-big">--%>
-                                    <%--<input name="templateTypeName" class="text-box-big" id="templateTypeName" size="100" white-list-patterns="^[a-zA-Z0-9]*$"/>--%>
-                                    <%--</td>--%>
-                                    <%--</tr>--%>
                                 <tr>
                                     <td class="leftCol-med labelField">
                                         <fmt:message key="email.template.type.display.name"/>

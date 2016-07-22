@@ -29,9 +29,6 @@ import org.wso2.carbon.email.mgt.dto.xsd.EmailTemplateDTO;
 import org.wso2.carbon.email.mgt.model.xsd.EmailTemplateType;
 import org.wso2.carbon.email.mgt.stub.I18NEmailMgtConfigServiceStub;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class I18nEmailMgtConfigServiceClient {
 
     private static Log log = LogFactory.getLog(I18nEmailMgtConfigServiceClient.class);
@@ -133,21 +130,30 @@ public class I18nEmailMgtConfigServiceClient {
      *
      * @throws Exception Error when loading Email Template information
      */
-    public EmailConfigDTO loadEmailConfig() throws AxisFault {
-        EmailTemplateDTO[] emailTemplates = null;
-        EmailConfigDTO emailConfig = new EmailConfigDTO();
+    public EmailTemplateDTO[] loadEmailTemplates() throws AxisFault {
         try {
-            emailTemplates = stub.getEmailConfig();
-            Map<String, String> emailTypes = new HashMap<String, String>();
-            for (int i = 0; i < emailTemplates.length; i++) {
-                emailTypes.put(emailTemplates[i].getName(), emailTemplates[i].getDisplayName());
-            }
-            emailConfig.setEmailTypes(emailTypes);
-            emailConfig.setTemplates(emailTemplates);
+            return stub.getEmailConfig();
         } catch (Exception e) {
             handleException(e.getMessage(), e);
         }
-        return emailConfig;
+
+        return new EmailTemplateDTO[0];
+    }
+
+    public void deleteEmailTemplate(String templateType, String localeCode) throws AxisFault {
+        try {
+            stub.deleteEmailTemplate(templateType, localeCode);
+        } catch (Exception e) {
+            handleException(e.getMessage(), e);
+        }
+    }
+
+    public void deleteEmailTemplateType(String templateType) throws AxisFault {
+        try {
+            stub.deleteEmailTemplateType(templateType);
+        } catch (Exception e) {
+            handleException(e.getMessage(), e);
+        }
     }
 
 }

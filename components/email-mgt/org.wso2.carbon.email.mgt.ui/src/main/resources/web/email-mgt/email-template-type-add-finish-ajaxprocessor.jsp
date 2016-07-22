@@ -37,13 +37,13 @@
 <%@page import="org.apache.axis2.context.ConfigurationContext" %>
 <jsp:include page="../dialog/display_messages.jsp"/>
 <%@page import="org.apache.commons.lang.StringUtils" %>
-<%@page import="org.wso2.carbon.CarbonConstants" %>
+<%@page import="org.owasp.encoder.Encode" %>
+<%@ page import="org.wso2.carbon.CarbonConstants" %>
 <%@ page import="org.wso2.carbon.email.mgt.model.xsd.EmailTemplateType" %>
 <%@ page import="org.wso2.carbon.email.mgt.ui.I18nEmailMgtConfigServiceClient" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
-<%@ page import="org.owasp.encoder.Encode" %>
 <script type="text/javascript" src="extensions/js/vui.js"></script>
 <script type="text/javascript" src="../admin/js/main.js"></script>
 
@@ -55,13 +55,11 @@
         return;
     }
 
-//    String templateTypeName = request.getParameter("templateTypeName");
     String templateTypeDisplayName = request.getParameter("templateDisplayName");
-
     EmailTemplateType emailTemplateType = null;
     if (StringUtils.isNotBlank(templateTypeDisplayName)) {
         emailTemplateType = new EmailTemplateType();
-        emailTemplateType.setName(templateTypeDisplayName.replaceAll("//s+","").toLowerCase());
+        emailTemplateType.setName(templateTypeDisplayName.replaceAll("//s+", "").toLowerCase());
         emailTemplateType.setDisplayName(templateTypeDisplayName);
     }
 

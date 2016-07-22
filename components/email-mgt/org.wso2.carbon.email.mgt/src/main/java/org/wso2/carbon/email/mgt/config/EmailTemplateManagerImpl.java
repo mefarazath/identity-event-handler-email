@@ -136,7 +136,12 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
                         for (String template : templateType.getChildren()) {
                             Resource templateResource = resourceMgtService.getIdentityResource(template, tenantDomain);
                             if (templateResource != null) {
-                                templateList.add(Util.getEmailTemplateDTO(templateResource));
+                                try {
+                                    EmailTemplateDTO templateDTO = Util.getEmailTemplateDTO(templateResource);
+                                    templateList.add(templateDTO);
+                                } catch (I18nEmailMgtException ex) {
+                                    log.error(ex.getMessage(), ex);
+                                }
                             }
                         }
                     }
@@ -210,7 +215,7 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
         } catch (IdentityRuntimeException ex) {
             String msg = String.format("Error deleting %s:%s template from %s tenant registry.", templateTypeName,
                     localeCode, tenantDomain);
-            throw new I18nEmailMgtServerException(msg);
+            handleServerException(msg, ex);
         }
     }
 
@@ -227,8 +232,8 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
                 return;
             }
         } catch (IdentityRuntimeException ex) {
-            String error = "Error when tried to look for default email templates in %s tenant registry";
-            log.error(String.format(error, tenantDomain));
+            String error = "Error when tried to check for default email templates in %s tenant registry";
+            log.error(String.format(error, tenantDomain), ex);
         }
 
         // load DTOs from the Util class
@@ -237,7 +242,7 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
         for (EmailTemplateDTO emailTemplateDTO : defaultTemplates) {
             addEmailTemplate(emailTemplateDTO, tenantDomain);
             if (log.isDebugEnabled()) {
-                String msg = "Default template added to %s tenant registry : \n%s";
+                String msg = "Default template added to %s tenant registry : %n%s";
                 log.debug(String.format(msg, tenantDomain, emailTemplateDTO.toString()));
             }
         }

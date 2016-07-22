@@ -26,12 +26,12 @@
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
 <%@ page import="org.wso2.carbon.email.mgt.model.xsd.EmailTemplateType" %>
 <%@ page import="org.wso2.carbon.email.mgt.ui.I18nEmailMgtConfigServiceClient" %>
+<%@ page import="org.wso2.carbon.email.mgt.ui.Util" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.ResourceBundle" %>
-<%@ page import="org.wso2.carbon.email.mgt.ui.Util" %>
 <script type="text/javascript" src="extensions/js/vui.js"></script>
 <script type="text/javascript" src="../extensions/core/js/vui.js"></script>
 <script type="text/javascript" src="../admin/js/main.js"></script>
@@ -63,6 +63,9 @@
 
         // get template types
         emailTemplateTypes = client.getEmailTemplateTypes();
+        if (emailTemplateTypes == null) {
+            emailTemplateTypes = new EmailTemplateType[0];
+        }
 
     } catch (Exception e) {
         String message = resourceBundle.getString("error.while.loading.email.template.data");
@@ -175,7 +178,8 @@
                                                     String selected = StringUtils.equalsIgnoreCase(displayName, emailTemplateType) ? "selected" : "";
                                                     if (StringUtils.isNotBlank(displayName)) {
                                         %>
-                                        <option value="<%=displayName%>" <%=selected%>><%=displayName%></option>
+                                        <option value="<%=displayName%>" <%=selected%>><%=displayName%>
+                                        </option>
                                         <%
                                                     }
                                                 }
