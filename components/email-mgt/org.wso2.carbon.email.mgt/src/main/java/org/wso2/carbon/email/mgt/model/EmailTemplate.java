@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.email.mgt.dto;
+package org.wso2.carbon.email.mgt.model;
 
 import java.io.Serializable;
 
@@ -22,7 +22,7 @@ import java.io.Serializable;
  * Encapsulates email template data such as email subject,body,footer etc., which use
  * to construct the email template.
  */
-public class EmailTemplateDTO implements Serializable {
+public class EmailTemplate implements Serializable {
 
 	private static final long serialVersionUID = -8854592668563155088L;
 	private String subject;

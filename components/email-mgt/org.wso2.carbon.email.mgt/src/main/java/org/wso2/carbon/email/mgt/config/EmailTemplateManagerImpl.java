@@ -20,7 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.email.mgt.constants.I18nMgtConstants;
-import org.wso2.carbon.email.mgt.dto.EmailTemplateDTO;
+import org.wso2.carbon.email.mgt.model.EmailTemplate;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtClientException;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtException;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtServerException;
@@ -122,8 +122,8 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
     }
 
     @Override
-    public List<EmailTemplateDTO> getAllEmailTemplates(String tenantDomain) throws I18nEmailMgtException {
-        List<EmailTemplateDTO> templateList = new ArrayList<>();
+    public List<EmailTemplate> getAllEmailTemplates(String tenantDomain) throws I18nEmailMgtException {
+        List<EmailTemplate> templateList = new ArrayList<>();
 
         try {
             Collection baseDirectory = (Collection) resourceMgtService.getIdentityResource(
@@ -137,7 +137,7 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
                             Resource templateResource = resourceMgtService.getIdentityResource(template, tenantDomain);
                             if (templateResource != null) {
                                 try {
-                                    EmailTemplateDTO templateDTO = Util.getEmailTemplateDTO(templateResource);
+                                    EmailTemplate templateDTO = Util.getEmailTemplateDTO(templateResource);
                                     templateList.add(templateDTO);
                                 } catch (I18nEmailMgtException ex) {
                                     log.error(ex.getMessage(), ex);
@@ -156,13 +156,13 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
     }
 
     @Override
-    public EmailTemplateDTO getEmailTemplate(String templateType, String locale, String tenantDomain) throws
+    public EmailTemplate getEmailTemplate(String templateType, String locale, String tenantDomain) throws
             I18nEmailMgtException {
         return null;
     }
 
     @Override
-    public void addEmailTemplate(EmailTemplateDTO templateDTO, String tenantDomain) throws I18nEmailMgtException {
+    public void addEmailTemplate(EmailTemplate templateDTO, String tenantDomain) throws I18nEmailMgtException {
         ValidationUtil.validateEmailTemplate(templateDTO);
 
         Resource templateResource = Util.createTemplateResource(templateDTO);
@@ -191,7 +191,7 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
     }
 
     @Override
-    public void updateEmailTemplate(EmailTemplateDTO templateDTO, String tenantDomain) {
+    public void updateEmailTemplate(EmailTemplate templateDTO, String tenantDomain) {
     }
 
     @Override
@@ -237,9 +237,9 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
         }
 
         // load DTOs from the Util class
-        List<EmailTemplateDTO> defaultTemplates = Util.getDefaultEmailTemplates();
+        List<EmailTemplate> defaultTemplates = Util.getDefaultEmailTemplates();
         // iterate through the list and write to registry!
-        for (EmailTemplateDTO emailTemplateDTO : defaultTemplates) {
+        for (EmailTemplate emailTemplateDTO : defaultTemplates) {
             addEmailTemplate(emailTemplateDTO, tenantDomain);
             if (log.isDebugEnabled()) {
                 String msg = "Default template added to %s tenant registry : %n%s";

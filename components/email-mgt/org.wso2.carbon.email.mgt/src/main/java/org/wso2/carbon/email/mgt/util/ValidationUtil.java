@@ -17,14 +17,11 @@
 package org.wso2.carbon.email.mgt.util;
 
 import org.apache.commons.lang.StringUtils;
-import org.wso2.carbon.email.mgt.dto.EmailTemplateDTO;
+import org.wso2.carbon.email.mgt.model.EmailTemplate;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtClientException;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtException;
-import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtServerException;
 import org.wso2.carbon.email.mgt.exceptions.I18nMgtEmailConfigException;
 import org.wso2.carbon.email.mgt.model.EmailTemplateType;
-import org.wso2.carbon.identity.base.IdentityValidationException;
-import org.wso2.carbon.identity.base.IdentityValidationUtil;
 
 public class ValidationUtil {
     private static final String REGEX_KEY_PREFIX = "org.wso2.carbon.email.mgt_";
@@ -62,7 +59,7 @@ public class ValidationUtil {
 
     }
 
-    public static void validateEmailTemplate(EmailTemplateDTO emailTemplate) throws I18nEmailMgtClientException{
+    public static void validateEmailTemplate(EmailTemplate emailTemplate) throws I18nEmailMgtClientException{
         if (emailTemplate == null) {
             throw new I18nEmailMgtClientException("Email Template cannot be null");
         }

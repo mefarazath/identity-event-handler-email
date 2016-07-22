@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.email.mgt.config.EmailTemplateManagerImpl;
-import org.wso2.carbon.email.mgt.dto.EmailTemplateDTO;
+import org.wso2.carbon.email.mgt.model.EmailTemplate;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtException;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtServerException;
 import org.wso2.carbon.email.mgt.model.EmailTemplateType;
@@ -77,7 +77,7 @@ public class I18nEmailMgtConfigService {
      * @param emailTemplate - Email templates to be saved.
      * @throws I18nEmailMgtServerException
      */
-    public void saveEmailConfig(EmailTemplateDTO emailTemplate) throws I18nEmailMgtServerException {
+    public void saveEmailConfig(EmailTemplate emailTemplate) throws I18nEmailMgtServerException {
 
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
@@ -94,7 +94,7 @@ public class I18nEmailMgtConfigService {
      * @param emailTemplate - Email templates to be saved.
      * @throws I18nEmailMgtServerException
      */
-    public void addEmailConfig(EmailTemplateDTO emailTemplate) throws I18nEmailMgtServerException {
+    public void addEmailConfig(EmailTemplate emailTemplate) throws I18nEmailMgtServerException {
 
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
@@ -111,13 +111,13 @@ public class I18nEmailMgtConfigService {
      * @return an Array of templates.
      * @throws I18nEmailMgtServerException
      */
-    public EmailTemplateDTO[] getEmailConfig() throws I18nEmailMgtServerException {
+    public EmailTemplate[] getEmailConfig() throws I18nEmailMgtServerException {
 
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        EmailTemplateDTO[] templates = null;
+        EmailTemplate[] templates = null;
         try {
-            List<EmailTemplateDTO> templateDTOs = templateManager.getAllEmailTemplates(tenantDomain);
-            templates = templateDTOs.toArray(new EmailTemplateDTO[templateDTOs.size()]);
+            List<EmailTemplate> templateDTOs = templateManager.getAllEmailTemplates(tenantDomain);
+            templates = templateDTOs.toArray(new EmailTemplate[templateDTOs.size()]);
         } catch (I18nEmailMgtException e) {
             String errorMsg = "Error occurred while retrieving email templates of " + tenantDomain + " tenant.";
             handleException(errorMsg, e);

@@ -16,7 +16,7 @@
 
 package org.wso2.carbon.email.mgt.config;
 
-import org.wso2.carbon.email.mgt.dto.EmailTemplateDTO;
+import org.wso2.carbon.email.mgt.model.EmailTemplate;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtException;
 import org.wso2.carbon.email.mgt.model.EmailTemplateType;
 
@@ -30,14 +30,14 @@ public interface EmailTemplateManager {
 
     List<EmailTemplateType> getAvailableTemplateTypes(String tenantDomain) throws I18nEmailMgtException;
 
-    List<EmailTemplateDTO> getAllEmailTemplates(String tenantDomain) throws I18nEmailMgtException;
+    List<EmailTemplate> getAllEmailTemplates(String tenantDomain) throws I18nEmailMgtException;
 
-    EmailTemplateDTO getEmailTemplate(String templateType, String locale, String tenantDomain) throws
+    EmailTemplate getEmailTemplate(String templateType, String locale, String tenantDomain) throws
             I18nEmailMgtException;
 
-    void addEmailTemplate(EmailTemplateDTO templateDTO, String tenantDomain) throws I18nEmailMgtException;
+    void addEmailTemplate(EmailTemplate templateDTO, String tenantDomain) throws I18nEmailMgtException;
 
-    void updateEmailTemplate(EmailTemplateDTO templateDTO, String tenantDomain) throws I18nEmailMgtException;
+    void updateEmailTemplate(EmailTemplate templateDTO, String tenantDomain) throws I18nEmailMgtException;
 
     void deleteEmailTemplate(String templateTypeName, String localeCode, String tenantDomain) throws I18nEmailMgtException;
 

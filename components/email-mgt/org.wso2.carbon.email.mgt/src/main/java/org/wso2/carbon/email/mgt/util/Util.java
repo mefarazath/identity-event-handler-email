@@ -22,7 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.email.mgt.constants.I18nMgtConstants;
-import org.wso2.carbon.email.mgt.dto.EmailTemplateDTO;
+import org.wso2.carbon.email.mgt.model.EmailTemplate;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtException;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtServerException;
 import org.wso2.carbon.email.mgt.exceptions.I18nMgtEmailConfigException;
@@ -61,11 +61,11 @@ public class Util {
         throw new I18nEmailMgtException("Invalid template type name provided : " + templateTypeName);
     }
 
-    public static List<EmailTemplateDTO> getDefaultEmailTemplates() {
+    public static List<EmailTemplate> getDefaultEmailTemplates() {
         String configFilePath = CarbonUtils.getCarbonConfigDirPath() + File.separator +
                 I18nMgtConstants.EMAIL_CONF_DIRECTORY + File.separator + I18nMgtConstants.EMAIL_ADMIN_CONF_FILE;
 
-        List<EmailTemplateDTO> defaultTemplates = new ArrayList<>();
+        List<EmailTemplate> defaultTemplates = new ArrayList<>();
         File configFile = new File(configFilePath);
         if (!configFile.exists()) {
             log.error("Email Configuration File is not present at: " + configFilePath);
@@ -93,7 +93,7 @@ public class Util {
                 String footer = emailContentMap.get(I18nMgtConstants.TEMPLATE_FOOTER);
 
                 // create the DTO and add to list
-                EmailTemplateDTO emailTemplateDTO = new EmailTemplateDTO();
+                EmailTemplate emailTemplateDTO = new EmailTemplate();
                 emailTemplateDTO.setName(type);
                 emailTemplateDTO.setDisplayName(displayName);
                 emailTemplateDTO.setLocale(locale);
@@ -143,7 +143,7 @@ public class Util {
         return emailContentMap;
     }
 
-    public static Resource createTemplateResource(EmailTemplateDTO emailTemplateDTO) throws I18nEmailMgtException {
+    public static Resource createTemplateResource(EmailTemplate emailTemplateDTO) throws I18nEmailMgtException {
         Resource templateResource = new ResourceImpl();
 
         String templateDisplayName = emailTemplateDTO.getDisplayName();
@@ -175,8 +175,8 @@ public class Util {
         return templateResource;
     }
 
-    public static EmailTemplateDTO getEmailTemplateDTO(Resource templateResource) throws I18nEmailMgtException {
-        EmailTemplateDTO templateDTO = new EmailTemplateDTO();
+    public static EmailTemplate getEmailTemplateDTO(Resource templateResource) throws I18nEmailMgtException {
+        EmailTemplate templateDTO = new EmailTemplate();
         try {
             // process email template meta-data properties
             String templateDisplayName = templateResource.getProperty(I18nMgtConstants.TEMPLATE_TYPE_DISPLAY_NAME);
