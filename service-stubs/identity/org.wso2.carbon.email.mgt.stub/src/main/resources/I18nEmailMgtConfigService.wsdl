@@ -26,7 +26,22 @@
             <xs:element name="getEmailTemplateTypesResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2113:EmailTemplateType"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addEmailConfig">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="emailTemplate" nillable="true" type="ax2113:EmailTemplate"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteEmailTemplate">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="emailTemplateDisplayName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="locale" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -42,32 +57,17 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="deleteEmailTemplateType">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="emailTemplateType" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deleteEmailTemplate">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="templateType" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="locale" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="addEmailTemplateType">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="emailTemplateType" nillable="true" type="ax2113:EmailTemplateType"/>
+                        <xs:element minOccurs="0" name="emailTemplateDisplayName" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="addEmailConfig">
+            <xs:element name="deleteEmailTemplateType">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="emailTemplate" nillable="true" type="ax2113:EmailTemplate"/>
+                        <xs:element minOccurs="0" name="emailTemplateDisplayName" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -76,18 +76,12 @@
             <xs:complexType name="EmailTemplate">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="body" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="displayName" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="emailContentType" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="footer" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="locale" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="subject" nillable="true" type="xs:string"/>
-                </xs:sequence>
-            </xs:complexType>
-            <xs:complexType name="EmailTemplateType">
-                <xs:sequence>
-                    <xs:element minOccurs="0" name="displayName" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="templateDisplayName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="templateType" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
         </xs:schema>

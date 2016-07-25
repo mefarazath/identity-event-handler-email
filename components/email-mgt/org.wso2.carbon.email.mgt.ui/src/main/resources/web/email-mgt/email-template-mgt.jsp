@@ -31,7 +31,7 @@
         <h2><fmt:message key='email.template.mgt'/></h2>
 
         <div id="workArea">
-            <table class="styledLeft" id="internal" name="internal" width="100%">
+            <table class="styledLeft" id="internal" templateType="internal" width="100%">
                 <tr class="tableOddRow">
                     <td style="width: 30px;">
                         <div style="height:30px;">

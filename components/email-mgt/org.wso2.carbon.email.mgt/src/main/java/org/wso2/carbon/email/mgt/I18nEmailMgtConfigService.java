@@ -25,12 +25,11 @@ import org.wso2.carbon.email.mgt.config.EmailTemplateManagerImpl;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtException;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtServerException;
 import org.wso2.carbon.email.mgt.model.EmailTemplate;
-import org.wso2.carbon.email.mgt.model.EmailTemplateType;
 
 import java.util.List;
 
 /**
- * This service provides functionality for managing internationalized email templates used for notifications across the
+ * This service provides functionality for managing internationalized email templates used for notifications across
  * Identity components.
  */
 public class I18nEmailMgtConfigService {
@@ -39,14 +38,16 @@ public class I18nEmailMgtConfigService {
     private EmailTemplateManagerImpl templateManager = new EmailTemplateManagerImpl();
 
     /**
-     * @param emailTemplateType
+     * Add a new email template type for a tenant.
+     *
+     * @param emailTemplateDisplayName Display Name of the email template (eg: Account Recovery, Password Reset)
      * @throws I18nEmailMgtServerException
      */
-    public void addEmailTemplateType(EmailTemplateType emailTemplateType) throws I18nEmailMgtServerException {
+    public void addEmailTemplateType(String emailTemplateDisplayName) throws I18nEmailMgtServerException {
 
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
-            templateManager.addEmailTemplateType(emailTemplateType, tenantDomain);
+            templateManager.addEmailTemplateType(emailTemplateDisplayName, tenantDomain);
         } catch (I18nEmailMgtException e) {
             String errorMsg = String.format("Error while adding email template type to %s tenant.", tenantDomain);
             handleException(errorMsg, e);
@@ -54,22 +55,45 @@ public class I18nEmailMgtConfigService {
     }
 
     /**
-     * @return
+     * Delete an email template type from a tenant registry.
+     *
+     * @param emailTemplateDisplayName Display name of the email template type to be deleted.
      * @throws I18nEmailMgtServerException
      */
-    public EmailTemplateType[] getEmailTemplateTypes() throws I18nEmailMgtServerException {
+    public void deleteEmailTemplateType(String emailTemplateDisplayName) throws I18nEmailMgtServerException {
 
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
-            List<EmailTemplateType> emailTemplateTypes = templateManager.getAvailableTemplateTypes(tenantDomain);
-            return emailTemplateTypes.toArray(new EmailTemplateType[emailTemplateTypes.size()]);
+            templateManager.deleteEmailTemplateType(emailTemplateDisplayName, tenantDomain);
+        } catch (I18nEmailMgtException e) {
+            String errorMsg = "Error occurred while deleting email template type '%s' of %s tenant.";
+            handleException(String.format(errorMsg, emailTemplateDisplayName, tenantDomain), e);
+        }
+    }
+
+
+    /**
+     * Get email template types available in the tenant.
+     *
+     * @return List of template type display names available.
+     * @throws I18nEmailMgtServerException
+     */
+    public String[] getEmailTemplateTypes() throws I18nEmailMgtServerException {
+
+        String[] emailTemplateTypes = new String[0];
+
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        try {
+            List<String> emailTemplateTypesList = templateManager.getAvailableTemplateTypes(tenantDomain);
+            emailTemplateTypes = emailTemplateTypesList.toArray(new String[emailTemplateTypesList.size()]);
         } catch (I18nEmailMgtException e) {
             String errorMsg = String.format("Error while retrieving email template types of %s tenant.", tenantDomain);
             handleException(errorMsg, e);
         }
 
-        return new EmailTemplateType[0];
+        return emailTemplateTypes;
     }
+
 
     /**
      * This method is used to save the email template specific to a tenant.
@@ -106,6 +130,23 @@ public class I18nEmailMgtConfigService {
     }
 
     /**
+     * @param emailTemplateDisplayName
+     * @param locale
+     * @throws I18nEmailMgtServerException
+     */
+    public void deleteEmailTemplate(String emailTemplateDisplayName, String locale) throws I18nEmailMgtServerException {
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        try {
+            templateManager.deleteEmailTemplate(emailTemplateDisplayName, locale, tenantDomain);
+        } catch (I18nEmailMgtException e) {
+            String errorMsg = "Error occurred while deleting email template type '" + emailTemplateDisplayName +
+                    "' of locale '" + locale + "' in " + tenantDomain + " tenant registry.";
+            handleException(errorMsg, e);
+        }
+
+    }
+
+    /**
      * This method is used to load the email template specific to a tenant.
      *
      * @return an Array of templates.
@@ -126,31 +167,6 @@ public class I18nEmailMgtConfigService {
         return templates;
     }
 
-
-    public void deleteEmailTemplateType(String emailTemplateType) throws I18nEmailMgtServerException {
-
-        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        try {
-            templateManager.deleteEmailTemplateType(emailTemplateType, tenantDomain);
-        } catch (I18nEmailMgtException e) {
-            String errorMsg = "Error occurred while deleting email template type '" + emailTemplateType + "' of " +
-                    tenantDomain + " tenant.";
-            handleException(errorMsg, e);
-        }
-    }
-
-
-    public void deleteEmailTemplate(String templateType, String locale) throws I18nEmailMgtServerException {
-        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        try {
-            templateManager.deleteEmailTemplate(templateType, locale, tenantDomain);
-        } catch (I18nEmailMgtException e) {
-            String errorMsg = "Error occurred while deleting email template type '" + templateType + "' of locale '"
-                    + locale + "' in " + tenantDomain + " tenant registry.";
-            handleException(errorMsg, e);
-        }
-
-    }
 
     private void handleException(String errorMessage, I18nEmailMgtException e) throws I18nEmailMgtServerException {
         log.error(errorMessage, e);

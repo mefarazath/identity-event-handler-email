@@ -47,7 +47,7 @@
 
     EmailTemplate templateAdded = new EmailTemplate();
     if (StringUtils.isNotBlank(emailTypeDisplayName)) {
-        templateAdded.setDisplayName(emailTypeDisplayName);
+        templateAdded.setTemplateDisplayName(emailTypeDisplayName);
     }
     if (StringUtils.isNotBlank(emailLocale)) {
         templateAdded.setLocale(emailLocale);

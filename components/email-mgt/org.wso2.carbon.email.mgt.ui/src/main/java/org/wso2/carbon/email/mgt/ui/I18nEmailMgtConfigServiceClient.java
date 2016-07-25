@@ -26,7 +26,6 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.email.mgt.model.xsd.EmailTemplate;
-import org.wso2.carbon.email.mgt.model.xsd.EmailTemplateType;
 import org.wso2.carbon.email.mgt.stub.I18NEmailMgtConfigServiceStub;
 
 public class I18nEmailMgtConfigServiceClient {
@@ -73,7 +72,7 @@ public class I18nEmailMgtConfigServiceClient {
      * @param emailTemplateType
      * @throws AxisFault
      */
-    public void addTemplateType(EmailTemplateType emailTemplateType) throws AxisFault {
+    public void addTemplateType(String emailTemplateType) throws AxisFault {
         try {
             stub.addEmailTemplateType(emailTemplateType);
         } catch (Exception e) {
@@ -87,8 +86,8 @@ public class I18nEmailMgtConfigServiceClient {
      * @return
      * @throws AxisFault
      */
-    public EmailTemplateType[] getEmailTemplateTypes() throws AxisFault {
-        EmailTemplateType[] emailTemplateTypes = new EmailTemplateType[0];
+    public String[] getEmailTemplateTypes() throws AxisFault {
+        String[] emailTemplateTypes = new String[0];
         try {
             emailTemplateTypes = stub.getEmailTemplateTypes();
         } catch (Exception e) {

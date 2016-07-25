@@ -48,10 +48,10 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-public class Util {
-    private static final Log log = LogFactory.getLog(Util.class);
+public class I18nEmailUtil {
+    private static final Log log = LogFactory.getLog(I18nEmailUtil.class);
 
-    private Util() {
+    private I18nEmailUtil() {
     }
 
     public static String getNormalizedName(String templateTypeName) throws I18nEmailMgtException {
@@ -94,8 +94,8 @@ public class Util {
 
                 // create the DTO and add to list
                 EmailTemplate emailTemplateDTO = new EmailTemplate();
-                emailTemplateDTO.setName(type);
-                emailTemplateDTO.setDisplayName(displayName);
+                emailTemplateDTO.setTemplateType(type);
+                emailTemplateDTO.setTemplateDisplayName(displayName);
                 emailTemplateDTO.setLocale(locale);
                 emailTemplateDTO.setEmailContentType(contentType);
 
@@ -146,8 +146,8 @@ public class Util {
     public static Resource createTemplateResource(EmailTemplate emailTemplateDTO) throws I18nEmailMgtException {
         Resource templateResource = new ResourceImpl();
 
-        String templateDisplayName = emailTemplateDTO.getDisplayName();
-        String templateType = Util.getNormalizedName(templateDisplayName);
+        String templateDisplayName = emailTemplateDTO.getTemplateDisplayName();
+        String templateType = I18nEmailUtil.getNormalizedName(templateDisplayName);
         String locale = emailTemplateDTO.getLocale();
         String contentType = emailTemplateDTO.getEmailContentType();
 
@@ -184,8 +184,8 @@ public class Util {
             String contentType = templateResource.getProperty(I18nMgtConstants.TEMPLATE_CONTENT_TYPE);
             String locale = templateResource.getProperty(I18nMgtConstants.TEMPLATE_LOCALE);
 
-            templateDTO.setDisplayName(templateDisplayName);
-            templateDTO.setName(templateType);
+            templateDTO.setTemplateDisplayName(templateDisplayName);
+            templateDTO.setTemplateType(templateType);
             templateDTO.setEmailContentType(contentType);
             templateDTO.setLocale(locale);
 

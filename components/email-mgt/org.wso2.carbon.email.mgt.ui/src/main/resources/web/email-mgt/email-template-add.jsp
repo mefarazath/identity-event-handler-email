@@ -24,7 +24,6 @@
 <%@page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.owasp.encoder.Encode" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
-<%@ page import="org.wso2.carbon.email.mgt.model.xsd.EmailTemplateType" %>
 <%@ page import="org.wso2.carbon.email.mgt.ui.I18nEmailMgtConfigServiceClient" %>
 <%@ page import="org.wso2.carbon.email.mgt.ui.Util" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
@@ -53,7 +52,7 @@
     ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE, request.getLocale());
 
     I18nEmailMgtConfigServiceClient client;
-    EmailTemplateType[] emailTemplateTypes = null;
+    String[] emailTemplateTypes = null;
     try {
         String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
         String backendServerURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
@@ -64,7 +63,7 @@
         // get template types
         emailTemplateTypes = client.getEmailTemplateTypes();
         if (emailTemplateTypes == null) {
-            emailTemplateTypes = new EmailTemplateType[0];
+            emailTemplateTypes = new String[0];
         }
 
     } catch (Exception e) {
@@ -156,7 +155,7 @@
 
             </script>
 
-            <form name="addemailtemplate" action="email-template-add-finish-ajaxprocessor.jsp" method="post">
+            <form templateType="addemailtemplate" action="email-template-add-finish-ajaxprocessor.jsp" method="post">
                 <table style="width: 100%" class="styledLeft">
                     <thead>
                     <tr>
@@ -170,15 +169,14 @@
                                 <tr>
                                     <td class="leftCol-med labelField"><fmt:message
                                             key="email.template.type"/></td>
-                                    <td><select id="" name="emailType" class="leftCol-med">
+                                    <td><select id="" templateType="emailType" class="leftCol-med">
                                         <%
                                             if (ArrayUtils.isNotEmpty(emailTemplateTypes)) {
-                                                for (EmailTemplateType templateType : emailTemplateTypes) {
-                                                    String displayName = templateType.getDisplayName();
-                                                    String selected = StringUtils.equalsIgnoreCase(displayName, emailTemplateType) ? "selected" : "";
-                                                    if (StringUtils.isNotBlank(displayName)) {
+                                                for (String templateDisplayName : emailTemplateTypes) {
+                                                    String selected = StringUtils.equalsIgnoreCase(templateDisplayName, emailTemplateType) ? "selected" : "";
+                                                    if (StringUtils.isNotBlank(templateDisplayName)) {
                                         %>
-                                        <option value="<%=displayName%>" <%=selected%>><%=displayName%>
+                                        <option value="<%=templateDisplayName%>" <%=selected%>><%=templateDisplayName%>
                                         </option>
                                         <%
                                                     }
@@ -191,7 +189,7 @@
                                 <tr>
                                     <td class="leftCol-med labelField"><fmt:message
                                             key="email.template.locale"/></td>
-                                    <td><select id="emailLocale" name="emailLocale" class="leftCol-med">
+                                    <td><select id="emailLocale" templateType="emailLocale" class="leftCol-med">
                                         <%
                                             for (Locale aLocale : availableLocale) {
                                                 String localeCode = Util.getLocaleCode(aLocale);
@@ -207,7 +205,7 @@
                                 <tr>
                                     <td class="leftCol-med labelField"><fmt:message
                                             key="email.template.contentType"/></td>
-                                    <td><select id="emailContentType" name="emailContentType" class="leftCol-med">
+                                    <td><select id="emailContentType" templateType="emailContentType" class="leftCol-med">
                                         <option>text/html</option>
                                         <option>text/plain</option>
                                     </select></td>
@@ -215,19 +213,19 @@
                                 <tr>
                                     <td class="leftCol-small"><fmt:message key='email.template.subject'/><font
                                             color="red">*</font></td>
-                                    <td><input type="text" name="emailSubject" id="emailSubject" class="text-box-big"
+                                    <td><input type="text" templateType="emailSubject" id="emailSubject" class="text-box-big"
                                                style="width:500px"/></td>
                                 </tr>
                                 <tr>
                                     <td class="leftCol-small"><fmt:message key='email.template.body'/><font color="red">*</font>
                                     </td>
-                                    <td><textarea name="emailBody" id="emailBody" class="text-box-big"
+                                    <td><textarea templateType="emailBody" id="emailBody" class="text-box-big"
                                                   style="width: 500px; height: 170px;"></textarea></td>
                                 </tr>
                                 <tr>
                                     <td class="leftCol-small"><fmt:message key='email.template.footer'/><font
                                             color="red">*</font></td>
-                                    <td><textarea name="emailFooter" id="emailFooter" class="text-box-big"
+                                    <td><textarea templateType="emailFooter" id="emailFooter" class="text-box-big"
                                                   style="width: 265px; height: 87px;"></textarea></td>
                                 </tr>
                             </table>

@@ -28,8 +28,8 @@ public class EmailTemplate implements Serializable {
 	private String subject;
 	private String body;
 	private String footer;
-	private String name;
-	private String displayName;
+	private String templateType;
+	private String templateDisplayName;
 	private String locale;
 	private String emailContentType;
 
@@ -58,20 +58,20 @@ public class EmailTemplate implements Serializable {
 		this.footer = footer;
 	}
 
-	public String getName() {
-		return name;
+	public String getTemplateType() {
+		return templateType;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTemplateType(String templateType) {
+		this.templateType = templateType;
 	}
 
-	public String getDisplayName() {
-		return displayName;
+	public String getTemplateDisplayName() {
+		return templateDisplayName;
 	}
 
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
+	public void setTemplateDisplayName(String templateDisplayName) {
+		this.templateDisplayName = templateDisplayName;
 	}
 
 	public String getLocale() {
@@ -93,7 +93,7 @@ public class EmailTemplate implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("displayName: ").append(displayName).append("\n")
+		stringBuilder.append("templateDisplayName: ").append(templateDisplayName).append("\n")
 				.append("locale: ").append(locale).append("\n")
 				.append("contentType: ").append(emailContentType).append("\n")
 				.append("subject: ").append(subject).append("\n")

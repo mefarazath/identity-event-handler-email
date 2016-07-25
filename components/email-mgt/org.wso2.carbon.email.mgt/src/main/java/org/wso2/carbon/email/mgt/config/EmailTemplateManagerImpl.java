@@ -20,14 +20,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.email.mgt.constants.I18nMgtConstants;
-import org.wso2.carbon.email.mgt.model.EmailTemplate;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtClientException;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtException;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtServerException;
 import org.wso2.carbon.email.mgt.internal.I18nMgtDataHolder;
-import org.wso2.carbon.email.mgt.model.EmailTemplateType;
-import org.wso2.carbon.email.mgt.util.Util;
-import org.wso2.carbon.email.mgt.util.ValidationUtil;
+import org.wso2.carbon.email.mgt.model.EmailTemplate;
+import org.wso2.carbon.email.mgt.util.I18nEmailUtil;
 import org.wso2.carbon.identity.base.IdentityRuntimeException;
 import org.wso2.carbon.identity.core.persistence.registry.RegistryResourceMgtService;
 import org.wso2.carbon.registry.core.Collection;
@@ -52,27 +50,27 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
 
 
     @Override
-    public void addEmailTemplateType(EmailTemplateType emailTemplateType, String tenantDomain) throws
+    public void addEmailTemplateType(String emailTemplateDisplayName, String tenantDomain) throws
             I18nEmailMgtException {
-        ValidationUtil.validateEmailTemplateType(emailTemplateType);
 
-        String templateDisplayName = emailTemplateType.getDisplayName();
-        String normalizedTemplateName = Util.getNormalizedName(templateDisplayName);
+        validateEmailTemplateType(emailTemplateDisplayName);
+        // get template directory name from display name.
+        String normalizedTemplateName = I18nEmailUtil.getNormalizedName(emailTemplateDisplayName);
 
         // persist the template type to registry ie. create a directory.
         String path = TEMPLATE_BASE_PATH + PATH_SEPARATOR + normalizedTemplateName;
         try {
             // check whether a template exists with the same name.
             if (resourceMgtService.isResourceExists(path, tenantDomain)) {
-                String errorMsg = String.format(I18nMgtConstants.ErrorMsg.ERROR_DUPLICATE_TEMPLATE_TYPE,
-                        templateDisplayName, tenantDomain);
+                String errorMsg = String.format(I18nMgtConstants.ErrorMsg.DUPLICATE_TEMPLATE_TYPE,
+                        emailTemplateDisplayName, tenantDomain);
                 throw new I18nEmailMgtClientException(errorMsg);
             }
 
-            Collection collection = createTemplateType(normalizedTemplateName, templateDisplayName);
+            Collection collection = createTemplateType(normalizedTemplateName, emailTemplateDisplayName);
             resourceMgtService.putIdentityResource(collection, path, tenantDomain);
         } catch (IdentityRuntimeException ex) {
-            String errorMsg = String.format("Error adding template type %s to %s tenant.", emailTemplateType,
+            String errorMsg = String.format("Error adding template type %s to %s tenant.", emailTemplateDisplayName,
                     tenantDomain);
             log.error(errorMsg);
             throw new I18nEmailMgtServerException(errorMsg, ex);
@@ -80,17 +78,19 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
     }
 
     @Override
-    public void deleteEmailTemplateType(String templateDisplayName, String tenantDomain) throws I18nEmailMgtException {
-        ValidationUtil.validateTemplateDisplayName(templateDisplayName);
+    public void deleteEmailTemplateType(String emailTemplateDisplayName, String tenantDomain) throws
+            I18nEmailMgtException {
 
-        String templateType = Util.getNormalizedName(templateDisplayName);
+        validateEmailTemplateType(emailTemplateDisplayName);
+
+        String templateType = I18nEmailUtil.getNormalizedName(emailTemplateDisplayName);
         String path = TEMPLATE_BASE_PATH + PATH_SEPARATOR + templateType;
 
         try {
             resourceMgtService.deleteIdentityResource(path, tenantDomain);
         } catch (IdentityRuntimeException ex) {
             String errorMsg = String.format
-                    ("Error deleting email template type %s from %s tenant.", templateDisplayName, tenantDomain);
+                    ("Error deleting email template type %s from %s tenant.", emailTemplateDisplayName, tenantDomain);
             handleServerException(errorMsg, ex);
         }
     }
@@ -101,16 +101,16 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
      * @throws I18nEmailMgtServerException
      */
     @Override
-    public List<EmailTemplateType> getAvailableTemplateTypes(String tenantDomain) throws I18nEmailMgtServerException {
+    public List<String> getAvailableTemplateTypes(String tenantDomain) throws I18nEmailMgtServerException {
         try {
-            List<EmailTemplateType> templateTypeList = new ArrayList<>();
+            List<String> templateTypeList = new ArrayList<>();
             Collection collection = (Collection) resourceMgtService.getIdentityResource(TEMPLATE_BASE_PATH,
                     tenantDomain);
 
             for (String templatePath : collection.getChildren()) {
                 Resource templateTypeResource = resourceMgtService.getIdentityResource(templatePath, tenantDomain);
                 if (templateTypeResource != null) {
-                    EmailTemplateType emailTemplateType = getTemplateType(templateTypeResource);
+                    String emailTemplateType = getTemplateDisplayName(templateTypeResource);
                     templateTypeList.add(emailTemplateType);
                 }
             }
@@ -136,8 +136,9 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
                         for (String template : templateType.getChildren()) {
                             Resource templateResource = resourceMgtService.getIdentityResource(template, tenantDomain);
                             if (templateResource != null) {
+                                // TODO  check here!
                                 try {
-                                    EmailTemplate templateDTO = Util.getEmailTemplateDTO(templateResource);
+                                    EmailTemplate templateDTO = I18nEmailUtil.getEmailTemplateDTO(templateResource);
                                     templateList.add(templateDTO);
                                 } catch (I18nEmailMgtException ex) {
                                     log.error(ex.getMessage(), ex);
@@ -156,27 +157,47 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
     }
 
     @Override
-    public EmailTemplate getEmailTemplate(String templateType, String locale, String tenantDomain) throws
+    public EmailTemplate getEmailTemplate(String emailTemplateDisplayName, String locale, String tenantDomain) throws
             I18nEmailMgtException {
+
+        EmailTemplate emailTemplate = null;
+
+        validateEmailTemplateType(emailTemplateDisplayName);
+        validateLocale(locale);
+
+        String templateDirectory = I18nEmailUtil.getNormalizedName(emailTemplateDisplayName);
+        String path = TEMPLATE_BASE_PATH + PATH_SEPARATOR + templateDirectory;
+
+        try {
+            Resource emailResource = resourceMgtService.getIdentityResource(path, tenantDomain, locale);
+            if (emailResource != null) {
+                emailTemplate = I18nEmailUtil.getEmailTemplateDTO(emailResource);
+            }
+        } catch (IdentityRuntimeException ex) {
+            String error = "Error when retrieving '%s:%s' template from %s tenant registry.";
+            handleServerException(String.format(emailTemplateDisplayName, locale, tenantDomain), ex);
+        }
+
         return null;
     }
 
     @Override
-    public void addEmailTemplate(EmailTemplate templateDTO, String tenantDomain) throws I18nEmailMgtException {
-        ValidationUtil.validateEmailTemplate(templateDTO);
+    public void addEmailTemplate(EmailTemplate emailTemplate, String tenantDomain) throws I18nEmailMgtException {
 
-        Resource templateResource = Util.createTemplateResource(templateDTO);
-        String templateTypeDisplayName = templateDTO.getDisplayName();
-        String templateType = Util.getNormalizedName(templateTypeDisplayName);
-        String locale = templateDTO.getLocale();
+        // validate the email template object before processing it.
+        validateEmailTemplate(emailTemplate);
+
+        Resource templateResource = I18nEmailUtil.createTemplateResource(emailTemplate);
+        String templateTypeDisplayName = emailTemplate.getTemplateDisplayName();
+        String templateType = I18nEmailUtil.getNormalizedName(templateTypeDisplayName);
+        String locale = emailTemplate.getLocale();
 
         String path = TEMPLATE_BASE_PATH + PATH_SEPARATOR + templateType; // template type root directory
         try {
             // check whether a template type root directory exists
             if (!resourceMgtService.isResourceExists(path, tenantDomain)) {
                 // we add new template type with relevant properties
-                EmailTemplateType emailTemplateType = new EmailTemplateType(templateType, templateTypeDisplayName);
-                addEmailTemplateType(emailTemplateType, tenantDomain);
+                addEmailTemplateType(templateTypeDisplayName, tenantDomain);
                 if (log.isDebugEnabled()) {
                     String msg = "Creating template type %s in %s tenant registry.";
                     log.debug(String.format(msg, templateTypeDisplayName, tenantDomain));
@@ -190,24 +211,20 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
         }
     }
 
-    @Override
-    public void updateEmailTemplate(EmailTemplate templateDTO, String tenantDomain) {
-    }
 
     @Override
     public void deleteEmailTemplate(String templateTypeName, String localeCode, String tenantDomain) throws
             I18nEmailMgtException {
-        // validate the name and locale code. TOD
-
+        // validate the name and locale code.
         if (StringUtils.isBlank(templateTypeName)) {
-            throw new I18nEmailMgtClientException("Email displayName cannot be null.");
+            throw new I18nEmailMgtClientException("Cannot Delete template. Email displayName cannot be null.");
         }
 
         if (StringUtils.isBlank(localeCode)) {
-            throw new I18nEmailMgtClientException("Email locale cannot be null.");
+            throw new I18nEmailMgtClientException("Cannot Delete template. Email locale cannot be null.");
         }
 
-        String templateType = Util.getNormalizedName(templateTypeName);
+        String templateType = I18nEmailUtil.getNormalizedName(templateTypeName);
         String path = TEMPLATE_BASE_PATH + PATH_SEPARATOR + templateType;
 
         try {
@@ -236,8 +253,8 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
             log.error(String.format(error, tenantDomain), ex);
         }
 
-        // load DTOs from the Util class
-        List<EmailTemplate> defaultTemplates = Util.getDefaultEmailTemplates();
+        // load DTOs from the I18nEmailUtil class
+        List<EmailTemplate> defaultTemplates = I18nEmailUtil.getDefaultEmailTemplates();
         // iterate through the list and write to registry!
         for (EmailTemplate emailTemplateDTO : defaultTemplates) {
             addEmailTemplate(emailTemplateDTO, tenantDomain);
@@ -253,16 +270,65 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
         }
     }
 
+
+    /**
+     * Validate an EmailTemplate object before persisting it into tenant's registry.
+     *
+     * @param emailTemplate
+     */
+    private void validateEmailTemplate(EmailTemplate emailTemplate) throws I18nEmailMgtClientException {
+        if (emailTemplate == null) {
+            throw new I18nEmailMgtClientException("Email Template object cannot be null.");
+        }
+
+        // TODO
+        // validate email template meta-data
+        // displayName
+
+        // templateTypeName --> if not equal normalized displayname set it to normalized display name.
+        // locale
+        // template type
+        //
+
+
+        // validate subject
+        // validate body
+        // validate footer
+
+    }
+
+    /**
+     * Validate the displayName of a email template type.
+     *
+     * @param templateDisplayName
+     * @throws I18nEmailMgtClientException
+     */
+    private void validateEmailTemplateType(String templateDisplayName) throws I18nEmailMgtClientException {
+        // check for null or empty
+        if (StringUtils.isBlank(templateDisplayName)) {
+            throw new I18nEmailMgtClientException("Email Template Type displayname cannot be null.");
+        }
+
+        // check whether display name of the template satisfy our regex ie. Only alphanumerics and spaces.
+        // TODO regex whitelist: alphanumeric + space / blacklist: registry invalid chars.
+    }
+
+
+    private void validateLocale(String localeCode) throws I18nEmailMgtClientException {
+        if (StringUtils.isBlank(localeCode)) {
+            throw new I18nEmailMgtClientException("Locale code cannot be empty or null");
+        }
+        // regex check for registry invalid chars.
+    }
+
     private void handleServerException(String errorMsg, Throwable ex) throws I18nEmailMgtServerException {
         log.error(errorMsg);
         throw new I18nEmailMgtServerException(errorMsg, ex);
     }
 
-    private EmailTemplateType getTemplateType(Resource templateTypeResource) {
-        String templateName = templateTypeResource.getProperty(I18nMgtConstants.EMAIL_TEMPLATE_NAME);
-        String templateDisplayName = templateTypeResource.getProperty(
-                I18nMgtConstants.EMAIL_TEMPLATE_TYPE_DISPLAY_NAME);
-        return new EmailTemplateType(templateName, templateDisplayName);
+    private String getTemplateDisplayName(Resource templateTypeResource) {
+        String templateDisplayName = templateTypeResource.getProperty(I18nMgtConstants.EMAIL_TEMPLATE_TYPE_DISPLAY_NAME);
+        return templateDisplayName;
     }
 
     private Collection createTemplateType(String normalizedTemplateName, String templateDisplayName) {

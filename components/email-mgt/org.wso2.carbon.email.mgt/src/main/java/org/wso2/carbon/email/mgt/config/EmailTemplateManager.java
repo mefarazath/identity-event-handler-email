@@ -16,31 +16,76 @@
 
 package org.wso2.carbon.email.mgt.config;
 
-import org.wso2.carbon.email.mgt.model.EmailTemplate;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtException;
-import org.wso2.carbon.email.mgt.model.EmailTemplateType;
+import org.wso2.carbon.email.mgt.model.EmailTemplate;
 
 import java.util.List;
 
 public interface EmailTemplateManager {
 
-    void addEmailTemplateType(EmailTemplateType emailTemplateType, String tenantDomain) throws I18nEmailMgtException;
+    /**
+     * @param emailTemplateType
+     * @param tenantDomain
+     * @throws I18nEmailMgtException
+     */
+    void addEmailTemplateType(String emailTemplateType,
+                              String tenantDomain) throws I18nEmailMgtException;
 
-    void deleteEmailTemplateType(String templateDisplayName, String tenantDomain) throws I18nEmailMgtException;
+    /**
+     * @param templateDisplayName
+     * @param tenantDomain
+     * @throws I18nEmailMgtException
+     */
+    void deleteEmailTemplateType(String templateDisplayName,
+                                 String tenantDomain) throws I18nEmailMgtException;
 
-    List<EmailTemplateType> getAvailableTemplateTypes(String tenantDomain) throws I18nEmailMgtException;
+    /**
+     * @param tenantDomain
+     * @return
+     * @throws I18nEmailMgtException
+     */
+    List<String> getAvailableTemplateTypes(String tenantDomain) throws I18nEmailMgtException;
 
+    /**
+     * @param emailTemplate
+     * @param tenantDomain
+     * @throws I18nEmailMgtException
+     */
+    void addEmailTemplate(EmailTemplate emailTemplate,
+                          String tenantDomain) throws I18nEmailMgtException;
+
+    /**
+     * @param templateTypeName
+     * @param localeCode
+     * @param tenantDomain
+     * @throws I18nEmailMgtException
+     */
+    void deleteEmailTemplate(String templateTypeName,
+                             String localeCode,
+                             String tenantDomain) throws I18nEmailMgtException;
+
+    /**
+     * @param templateType
+     * @param locale
+     * @param tenantDomain
+     * @return
+     * @throws I18nEmailMgtException
+     */
+    EmailTemplate getEmailTemplate(String templateType,
+                                   String locale,
+                                   String tenantDomain) throws I18nEmailMgtException;
+
+    /**
+     * @param tenantDomain
+     * @return
+     * @throws I18nEmailMgtException
+     */
     List<EmailTemplate> getAllEmailTemplates(String tenantDomain) throws I18nEmailMgtException;
 
-    EmailTemplate getEmailTemplate(String templateType, String locale, String tenantDomain) throws
-            I18nEmailMgtException;
-
-    void addEmailTemplate(EmailTemplate templateDTO, String tenantDomain) throws I18nEmailMgtException;
-
-    void updateEmailTemplate(EmailTemplate templateDTO, String tenantDomain) throws I18nEmailMgtException;
-
-    void deleteEmailTemplate(String templateTypeName, String localeCode, String tenantDomain) throws I18nEmailMgtException;
-
+    /**
+     * @param tenantDomain
+     * @throws I18nEmailMgtException
+     */
     void addDefaultEmailTemplates(String tenantDomain) throws I18nEmailMgtException;
 
 }

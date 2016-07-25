@@ -56,7 +56,7 @@
     <div id="middle">
         <h2><fmt:message key="email.template.type"/></h2>
 
-        <form id="templateTypeForm" name="templateTypeForm" method="post"
+        <form id="templateTypeForm" templateType="templateTypeForm" method="post"
               action="email-template-type-add-finish-ajaxprocessor.jsp">
             <div id="workArea">
                 <table class="styledLeft">
@@ -71,11 +71,11 @@
                             <table class="normal" cellspacing="0">
                                 <tr>
                                     <td class="leftCol-med labelField">
-                                        <fmt:message key="email.template.type.display.name"/>
+                                        <fmt:message key="email.template.type.display.templateType"/>
                                         <span class="required">*</span>
                                     </td>
                                     <td class="leftCol-big">
-                                        <input size="50" name="templateDisplayName" id="templateDisplayName"
+                                        <input size="50" templateType="templateDisplayName" id="templateDisplayName"
                                                class="text-box-big"
                                                white-list-patterns="^[a-zA-Z0-9\s]+$"/>
                                     </td>

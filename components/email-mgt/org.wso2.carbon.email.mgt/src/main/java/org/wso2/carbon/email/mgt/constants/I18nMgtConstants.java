@@ -54,8 +54,8 @@ public class I18nMgtConstants {
 
         public static final String ERROR_GET_EMAIL_TEMPLATES =
                 "Error when retrieving email template types of %s tenant.";
-        public static final String ERROR_DUPLICATE_TEMPLATE_TYPE =
-                "Email template type %s already exists in %s tenant registry.";
+        public static final String DUPLICATE_TEMPLATE_TYPE =
+                "Email template type '%s' already exists in %s tenant registry.";
 
     }
 

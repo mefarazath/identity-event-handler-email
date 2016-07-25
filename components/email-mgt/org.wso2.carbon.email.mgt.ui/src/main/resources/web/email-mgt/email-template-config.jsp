@@ -133,7 +133,7 @@
         var $selectedOption = jQuery(elm).find(":selected").text().trim();
         jQuery('<form>', {
             "id": "getTemplateType",
-            "html": '<input type="text" name="templateType" value="' + $selectedOption + '" />',
+            "html": '<input type="text" templateType="templateType" value="' + $selectedOption + '" />',
             "action": window.location.href
         }).appendTo(document.body).submit();
     }
@@ -223,7 +223,7 @@
         <div id="workArea">
             <% if (ArrayUtils.isNotEmpty(emailTemplates)) {%>
 
-            <form name="templateForm" action="email-template-config-finish-ajaxprocessor.jsp" method="post">
+            <form templateType="templateForm" action="email-template-config-finish-ajaxprocessor.jsp" method="post">
                 <div class="sectionSeperator">
                     <fmt:message key="email.template.set"/>
                 </div>
@@ -231,22 +231,22 @@
                     <table class="carbonFormTable">
                         <tr>
                             <td class="leftCol-med labelField"><fmt:message key="email.types"/></td>
-                            <td><select id="emailTypes" name="emailTypes" class="leftCol-med"
+                            <td><select id="emailTypes" templateType="emailTypes" class="leftCol-med"
                                         onchange="updateLocale(this);">
                                 <%
                                     for (EmailTemplate emailTemplate : emailTemplates) {
-\                                        String displayName = emailTemplate.getDisplayName();
-                                        String selected = StringUtils.equalsIgnoreCase(templateType, displayName) ? "selected" : "";
+                                        \String templateDisplayName = emailTemplate.getTemplateDisplayName();
+                                        String selected = StringUtils.equalsIgnoreCase(templateType, templateDisplayName) ? "selected" : "";
                                 %>
-                                <option value="<%=displayName%>" <%=selected%>>
-                                    <%=Encode.forHtmlContent(displayName)%>
+                                <option value="<%=templateDisplayName%>" <%=selected%>>
+                                    <%=Encode.forHtmlContent(templateDisplayName)%>
                                 </option>
                                 <%
                                     }
 
                                     if (StringUtils.isBlank(templateType)) {
                                         if (ArrayUtils.isNotEmpty(emailTemplates)) {
-                                            templateType = emailTemplates[0].getDisplayName();
+                                            templateType = emailTemplates[0].getTemplateDisplayName();
                                         }
                                     }
                                 %>
@@ -255,12 +255,12 @@
                         </tr>
                         <tr>
                             <td class="leftCol-med labelField"><fmt:message key="email.language"/></td>
-                            <td><select id="emailLanguage" name="emailLanguage" class="leftCol-med"
+                            <td><select id="emailLanguage" templateType="emailLanguage" class="leftCol-med"
                                         onchange="updateFields(this)">
                                 <%
                                     List<EmailTemplate> templatesList = new ArrayList<EmailTemplate>();
                                     for (EmailTemplate template : emailTemplates) {
-                                        if (template.getDisplayName().equalsIgnoreCase(templateType)) {
+                                        if (StringUtils.equalsIgnoreCase(template.getTemplateDisplayName(), templateType)) {
                                             templatesList.add(template);
                                         }
                                     }
@@ -271,14 +271,14 @@
                                             emailSubject0 = template.getSubject();
                                             emailBody0 = template.getBody();
                                             emailFooter0 = template.getFooter();
-                                            templateName0 = template.getName();
+                                            templateName0 = template.getTemplateType();
                                             emailContentType0 = template.getEmailContentType();
                                         }
 
                                         emailSubject = template.getSubject();
                                         emailBody = template.getBody();
                                         emailFooter = template.getFooter();
-                                        templateName = template.getName();
+                                        templateName = template.getTemplateType();
                                         emailContentType = template.getEmailContentType();
 
                                         String localeCode = template.getLocale();
@@ -302,7 +302,7 @@
                         <tr>
                             <td class="leftCol-med labelField"><fmt:message key="email.template.content"/></td>
 
-                            <td><select id="emailContentType" name="emailContentType" class="leftCol-med">
+                            <td><select id="emailContentType" templateType="emailContentType" class="leftCol-med">
                                 <%
                                     for (String currentType : emailContentTypeArr) {
                                         String currentSelectedAttr = "";
@@ -319,25 +319,25 @@
                         </tr>
                         <tr>
                             <td><fmt:message key="emailSubject"/></td>
-                            <td><input type="text" name="emailSubject" id="emailSubject" style="width : 500px;"
+                            <td><input type="text" templateType="emailSubject" id="emailSubject" style="width : 500px;"
                                        value="<%=Encode.forHtmlAttribute(emailSubject0)%>"/></td>
                         </tr>
                         <tr>
                             <td><fmt:message key="emailBody"/></td>
-                            <td><textarea name="emailBody" id="emailBody"
+                            <td><textarea templateType="emailBody" id="emailBody"
                                           class="text-box-big"
                                           style="width: 500px; height: 170px;"><%=Encode.forHtmlContent(emailBody0)%>
                             </textarea></td>
                         </tr>
                         <tr>
                             <td><fmt:message key="emailFooter"/></td>
-                            <td><textarea name="emailFooter" id="emailFooter"
+                            <td><textarea templateType="emailFooter" id="emailFooter"
                                           class="text-box-big"
                                           style="width: 265px; height: 87px;"><%=Encode.forHtmlContent(emailFooter0)%>
                             </textarea></td>
                         </tr>
                         <tr>
-                            <td><input type="hidden" name="templateName" id="templateName"
+                            <td><input type="hidden" templateType="templateName" id="templateName"
                                        value="<%=Encode.forHtmlAttribute(templateName0)%>"/></td>
                         </tr>
                     </table>

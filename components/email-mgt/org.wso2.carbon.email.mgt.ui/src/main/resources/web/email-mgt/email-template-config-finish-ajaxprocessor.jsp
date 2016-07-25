@@ -58,7 +58,7 @@
     EmailTemplate templateChanged = new EmailTemplate();
     if (!deleteTemplate) {
         if (StringUtils.isNotBlank(templateDisplayName)) {
-            templateChanged.setDisplayName(templateDisplayName);
+            templateChanged.setTemplateDisplayName(templateDisplayName);
         }
         if (StringUtils.isNotBlank(emailLocaleCode)) {
             templateChanged.setLocale(emailLocaleCode);
