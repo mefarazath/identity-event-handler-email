@@ -15,32 +15,28 @@
 ~ specific language governing permissions and limitations
 ~ under the License.
 -->
-
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar"
-           prefix="carbon" %>
+<%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <%@page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@page import="org.apache.commons.lang.ArrayUtils" %>
 <%@page import="org.apache.commons.lang.StringUtils" %>
 <%@page import="org.owasp.encoder.Encode" %>
 <%@page import="org.wso2.carbon.CarbonConstants" %>
-<script type="text/javascript" src="extensions/js/vui.js"></script>
-<script type="text/javascript" src="../extensions/core/js/vui.js"></script>
-<script type="text/javascript" src="../admin/js/main.js"></script>
 
-<jsp:include page="../dialog/display_messages.jsp"/>
 <%@ page import="org.wso2.carbon.email.mgt.model.xsd.EmailTemplate" %>
 <%@ page import="org.wso2.carbon.email.mgt.ui.I18nEmailMgtConfigServiceClient" %>
 <%@ page import="org.wso2.carbon.email.mgt.ui.Util" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
-<%@ page import="java.util.ArrayList" %>
+<%@page import="java.util.ArrayList" %>
+
+<%@ page import="java.util.HashSet" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ResourceBundle" %>
 
 <%
+    request.setCharacterEncoding("UTF-8");
     String templateType = request.getParameter("templateType");
 
     String username = request.getParameter("username");
@@ -133,7 +129,7 @@
         var $selectedOption = jQuery(elm).find(":selected").text().trim();
         jQuery('<form>', {
             "id": "getTemplateType",
-            "html": '<input type="text" templateType="templateType" value="' + $selectedOption + '" />',
+            "html": '<input type="text" name="templateType" value="' + $selectedOption + '" />',
             "action": window.location.href
         }).appendTo(document.body).submit();
     }
@@ -204,12 +200,6 @@
     }
 %>
 
-<script type="text/javascript" src="extensions/js/vui.js"></script>
-<script type="text/javascript" src="../extensions/core/js/vui.js"></script>
-<script type="text/javascript" src="../admin/js/main.js"></script>
-<script type="text/javascript" src="../carbon/admin/js/breadcrumbs.js"></script>
-<script type="text/javascript" src="../carbon/admin/js/cookies.js"></script>
-
 <fmt:bundle basename="org.wso2.carbon.email.mgt.ui.i18n.Resources">
     <carbon:breadcrumb label="email.template"
                        resourceBundle="org.wso2.carbon.identity.user.profile.ui.i18n.Resources"
@@ -223,7 +213,7 @@
         <div id="workArea">
             <% if (ArrayUtils.isNotEmpty(emailTemplates)) {%>
 
-            <form templateType="templateForm" action="email-template-config-finish-ajaxprocessor.jsp" method="post">
+            <form name="templateForm" action="email-template-config-finish-ajaxprocessor.jsp" method="post" accept-charset="utf-8">
                 <div class="sectionSeperator">
                     <fmt:message key="email.template.set"/>
                 </div>
@@ -231,17 +221,22 @@
                     <table class="carbonFormTable">
                         <tr>
                             <td class="leftCol-med labelField"><fmt:message key="email.types"/></td>
-                            <td><select id="emailTypes" templateType="emailTypes" class="leftCol-med"
+                            <td><select id="emailTypes" name="emailTypes" class="leftCol-med"
                                         onchange="updateLocale(this);">
                                 <%
+                                    HashSet<String> emailTypeNames = new HashSet<String>();
                                     for (EmailTemplate emailTemplate : emailTemplates) {
-                                        \String templateDisplayName = emailTemplate.getTemplateDisplayName();
+                                        String templateDisplayName = emailTemplate.getTemplateDisplayName();
                                         String selected = StringUtils.equalsIgnoreCase(templateType, templateDisplayName) ? "selected" : "";
+
+                                        if (!emailTypeNames.contains(templateDisplayName)) {
                                 %>
                                 <option value="<%=templateDisplayName%>" <%=selected%>>
                                     <%=Encode.forHtmlContent(templateDisplayName)%>
                                 </option>
                                 <%
+                                        emailTypeNames.add(templateDisplayName);
+                                        }
                                     }
 
                                     if (StringUtils.isBlank(templateType)) {
@@ -255,7 +250,7 @@
                         </tr>
                         <tr>
                             <td class="leftCol-med labelField"><fmt:message key="email.language"/></td>
-                            <td><select id="emailLanguage" templateType="emailLanguage" class="leftCol-med"
+                            <td><select id="emailLanguage" name="emailLanguage" class="leftCol-med"
                                         onchange="updateFields(this)">
                                 <%
                                     List<EmailTemplate> templatesList = new ArrayList<EmailTemplate>();
@@ -286,7 +281,7 @@
 
                                 %>
                                 <option
-                                        value="<%=localeCode%>"
+                                        value="<%=Encode.forHtmlAttribute(localeCode)%>"
                                         data-subject="<%=Encode.forHtmlAttribute(emailSubject)%>"
                                         data-body="<%=Encode.forHtmlAttribute(emailBody)%>"
                                         data-footer="<%=Encode.forHtmlAttribute(emailFooter)%>"
@@ -302,7 +297,7 @@
                         <tr>
                             <td class="leftCol-med labelField"><fmt:message key="email.template.content"/></td>
 
-                            <td><select id="emailContentType" templateType="emailContentType" class="leftCol-med">
+                            <td><select id="emailContentType" name="emailContentType" class="leftCol-med">
                                 <%
                                     for (String currentType : emailContentTypeArr) {
                                         String currentSelectedAttr = "";
@@ -319,25 +314,25 @@
                         </tr>
                         <tr>
                             <td><fmt:message key="emailSubject"/></td>
-                            <td><input type="text" templateType="emailSubject" id="emailSubject" style="width : 500px;"
+                            <td><input type="text" name="emailSubject" id="emailSubject" style="width : 500px;"
                                        value="<%=Encode.forHtmlAttribute(emailSubject0)%>"/></td>
                         </tr>
                         <tr>
                             <td><fmt:message key="emailBody"/></td>
-                            <td><textarea templateType="emailBody" id="emailBody"
+                            <td><textarea name="emailBody" id="emailBody"
                                           class="text-box-big"
                                           style="width: 500px; height: 170px;"><%=Encode.forHtmlContent(emailBody0)%>
                             </textarea></td>
                         </tr>
                         <tr>
                             <td><fmt:message key="emailFooter"/></td>
-                            <td><textarea templateType="emailFooter" id="emailFooter"
+                            <td><textarea name="emailFooter" id="emailFooter"
                                           class="text-box-big"
                                           style="width: 265px; height: 87px;"><%=Encode.forHtmlContent(emailFooter0)%>
                             </textarea></td>
                         </tr>
                         <tr>
-                            <td><input type="hidden" templateType="templateName" id="templateName"
+                            <td><input type="hidden" name="templateName" id="templateName"
                                        value="<%=Encode.forHtmlAttribute(templateName0)%>"/></td>
                         </tr>
                     </table>

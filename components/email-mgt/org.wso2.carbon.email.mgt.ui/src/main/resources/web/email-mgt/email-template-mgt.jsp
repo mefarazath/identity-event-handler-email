@@ -14,11 +14,8 @@
   ~ limitations under the License.
   --%>
 
-
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
-
-<jsp:include page="../dialog/display_messages.jsp"/>
 
 
 <fmt:bundle basename="org.wso2.carbon.email.mgt.ui.i18n.Resources">
@@ -31,7 +28,7 @@
         <h2><fmt:message key='email.template.mgt'/></h2>
 
         <div id="workArea">
-            <table class="styledLeft" id="internal" templateType="internal" width="100%">
+            <table class="styledLeft" id="internal" name="internal" width="100%">
                 <tr class="tableOddRow">
                     <td style="width: 30px;">
                         <div style="height:30px;">

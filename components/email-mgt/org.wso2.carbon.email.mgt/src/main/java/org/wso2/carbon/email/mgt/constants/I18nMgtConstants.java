@@ -48,6 +48,8 @@ public class I18nMgtConstants {
     public static final String TEMPLATE_FOOTER = "footer";
 
 
+    public static final String EMAIL_TEMPLATE_NAME_REGEX = "";
+
 
     public static class ErrorMsg {
         private ErrorMsg() {}

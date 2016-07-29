@@ -13,11 +13,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   --%>
-
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <script type="text/javascript" src="../identity/validation/js/identity-validate.js"></script>
-<jsp:include page="../dialog/display_messages.jsp"/>
 
 
 <fmt:bundle basename="org.wso2.carbon.email.mgt.ui.i18n.Resources">
@@ -48,7 +47,7 @@
         }
 
         function cancelForm() {
-            location.href = 'email-template-type-add.jsp';
+            location.href = 'email-template-mgt.jsp';
         }
 
     </script>
@@ -56,7 +55,7 @@
     <div id="middle">
         <h2><fmt:message key="email.template.type"/></h2>
 
-        <form id="templateTypeForm" templateType="templateTypeForm" method="post"
+        <form id="templateTypeForm" name="templateTypeForm" method="post"
               action="email-template-type-add-finish-ajaxprocessor.jsp">
             <div id="workArea">
                 <table class="styledLeft">
@@ -75,7 +74,7 @@
                                         <span class="required">*</span>
                                     </td>
                                     <td class="leftCol-big">
-                                        <input size="50" templateType="templateDisplayName" id="templateDisplayName"
+                                        <input size="50" name="templateDisplayName" id="templateDisplayName"
                                                class="text-box-big"
                                                white-list-patterns="^[a-zA-Z0-9\s]+$"/>
                                     </td>

@@ -138,7 +138,7 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
                             if (templateResource != null) {
                                 // TODO  check here!
                                 try {
-                                    EmailTemplate templateDTO = I18nEmailUtil.getEmailTemplateDTO(templateResource);
+                                    EmailTemplate templateDTO = I18nEmailUtil.getEmailTemplate(templateResource);
                                     templateList.add(templateDTO);
                                 } catch (I18nEmailMgtException ex) {
                                     log.error(ex.getMessage(), ex);
@@ -171,14 +171,14 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
         try {
             Resource emailResource = resourceMgtService.getIdentityResource(path, tenantDomain, locale);
             if (emailResource != null) {
-                emailTemplate = I18nEmailUtil.getEmailTemplateDTO(emailResource);
+                emailTemplate = I18nEmailUtil.getEmailTemplate(emailResource);
             }
         } catch (IdentityRuntimeException ex) {
             String error = "Error when retrieving '%s:%s' template from %s tenant registry.";
-            handleServerException(String.format(emailTemplateDisplayName, locale, tenantDomain), ex);
+            handleServerException(String.format(error, emailTemplateDisplayName, locale, tenantDomain), ex);
         }
 
-        return null;
+        return emailTemplate;
     }
 
     @Override
@@ -281,19 +281,28 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
             throw new I18nEmailMgtClientException("Email Template object cannot be null.");
         }
 
-        // TODO
-        // validate email template meta-data
-        // displayName
+        String templateDisplayName = emailTemplate.getTemplateDisplayName();
+        validateEmailTemplateType(templateDisplayName);
 
-        // templateTypeName --> if not equal normalized displayname set it to normalized display name.
-        // locale
-        // template type
-        //
+        String normalizedTemplateDisplayName = I18nEmailUtil.getNormalizedName(templateDisplayName);
+        if (!StringUtils.equalsIgnoreCase(normalizedTemplateDisplayName, emailTemplate.getTemplateType())) {
+            emailTemplate.setTemplateType(normalizedTemplateDisplayName);
+        }
+
+        String locale = emailTemplate.getLocale();
+        validateLocale(locale);
+
+        // TODO validate content type?
+        String contentType = emailTemplate.getTemplateType();
 
 
-        // validate subject
-        // validate body
-        // validate footer
+        String subject = emailTemplate.getSubject();
+        String body = emailTemplate.getBody();
+        String footer = emailTemplate.getFooter();
+
+        if (StringUtils.isBlank(subject) || StringUtils.isBlank(body) || StringUtils.isBlank(footer)) {
+            throw new I18nEmailMgtClientException("subject/body/footer sections of email template cannot be empty.");
+        }
 
     }
 
@@ -308,6 +317,7 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
         if (StringUtils.isBlank(templateDisplayName)) {
             throw new I18nEmailMgtClientException("Email Template Type displayname cannot be null.");
         }
+
 
         // check whether display name of the template satisfy our regex ie. Only alphanumerics and spaces.
         // TODO regex whitelist: alphanumeric + space / blacklist: registry invalid chars.

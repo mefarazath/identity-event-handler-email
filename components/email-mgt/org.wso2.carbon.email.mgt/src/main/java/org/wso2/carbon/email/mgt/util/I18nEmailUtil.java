@@ -22,10 +22,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.email.mgt.constants.I18nMgtConstants;
-import org.wso2.carbon.email.mgt.model.EmailTemplate;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtException;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtServerException;
 import org.wso2.carbon.email.mgt.exceptions.I18nMgtEmailConfigException;
+import org.wso2.carbon.email.mgt.model.EmailTemplate;
+import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.ResourceImpl;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
@@ -54,13 +55,21 @@ public class I18nEmailUtil {
     private I18nEmailUtil() {
     }
 
-    public static String getNormalizedName(String templateTypeName) throws I18nEmailMgtException {
+    /**
+     * @param templateTypeName
+     * @return
+     */
+    public static String getNormalizedName(String templateTypeName) {
         if (StringUtils.isNotBlank(templateTypeName)) {
             return templateTypeName.replaceAll("\\s+", "").toLowerCase();
         }
-        throw new I18nEmailMgtException("Invalid template type name provided : " + templateTypeName);
+        throw new IllegalArgumentException("Invalid template type name provided : " + templateTypeName);
     }
 
+
+    /**
+     * @return
+     */
     public static List<EmailTemplate> getDefaultEmailTemplates() {
         String configFilePath = CarbonUtils.getCarbonConfigDirPath() + File.separator +
                 I18nMgtConstants.EMAIL_CONF_DIRECTORY + File.separator + I18nMgtConstants.EMAIL_ADMIN_CONF_FILE;
@@ -143,6 +152,12 @@ public class I18nEmailUtil {
         return emailContentMap;
     }
 
+
+    /**
+     * @param emailTemplateDTO
+     * @return
+     * @throws I18nEmailMgtException
+     */
     public static Resource createTemplateResource(EmailTemplate emailTemplateDTO) throws I18nEmailMgtException {
         Resource templateResource = new ResourceImpl();
 
@@ -151,22 +166,24 @@ public class I18nEmailUtil {
         String locale = emailTemplateDTO.getLocale();
         String contentType = emailTemplateDTO.getEmailContentType();
 
-        String subject = emailTemplateDTO.getSubject();
-        String body = emailTemplateDTO.getBody();
-        String footer = emailTemplateDTO.getFooter();
+        String subject = getUtfEncodedString(emailTemplateDTO.getSubject());
+        String body = getUtfEncodedString(emailTemplateDTO.getBody());
+        String footer = getUtfEncodedString(emailTemplateDTO.getFooter());
 
         // set template properties
         templateResource.setProperty(I18nMgtConstants.TEMPLATE_TYPE_DISPLAY_NAME, templateDisplayName);
         templateResource.setProperty(I18nMgtConstants.TEMPLATE_TYPE, templateType);
         templateResource.setProperty(I18nMgtConstants.TEMPLATE_LOCALE, locale);
         templateResource.setProperty(I18nMgtConstants.TEMPLATE_CONTENT_TYPE, contentType);
-        templateResource.setMediaType(contentType);
+
+        templateResource.setMediaType(RegistryConstants.TAG_MEDIA_TYPE);
 
         String contentArray[] = {subject, body, footer};
         String content = StringUtils.join(contentArray, "|");
 
         try {
-            templateResource.setContent(content.getBytes("UTF-8"));
+            byte[] contentByteArray = content.getBytes("UTF-8");
+            templateResource.setContent(contentByteArray);
         } catch (RegistryException | UnsupportedEncodingException e) {
             String error = "Error creating a registry resource from contents of %s email template type in %s locale.";
             throw new I18nEmailMgtServerException(String.format(error, templateDisplayName, locale), e);
@@ -175,7 +192,17 @@ public class I18nEmailUtil {
         return templateResource;
     }
 
-    public static EmailTemplate getEmailTemplateDTO(Resource templateResource) throws I18nEmailMgtException {
+
+    private static String getUtfEncodedString(String text) {
+        return new String(text.getBytes(Charset.forName("UTF-8")));
+    }
+
+    /**
+     * @param templateResource
+     * @return
+     * @throws I18nEmailMgtException
+     */
+    public static EmailTemplate getEmailTemplate(Resource templateResource) throws I18nEmailMgtException {
         EmailTemplate templateDTO = new EmailTemplate();
         try {
             // process email template meta-data properties
@@ -192,10 +219,10 @@ public class I18nEmailUtil {
             // process email template content
             Object content = templateResource.getContent();
             if (content != null) {
-                byte templateContentArray[] = (byte[]) templateResource.getContent();
+                byte templateContentArray[] = (byte[]) content;
                 String templateContent = new String(templateContentArray, Charset.forName("UTF-8"));
-
                 String[] templateContentElements = StringUtils.split(templateContent, "|");
+
                 // TODO should find a better way to maintain sections of email template.
                 if (templateContentElements.length > 3) {
                     String errorMsg = "Template %s:%s contains '|' character which is invalid.";

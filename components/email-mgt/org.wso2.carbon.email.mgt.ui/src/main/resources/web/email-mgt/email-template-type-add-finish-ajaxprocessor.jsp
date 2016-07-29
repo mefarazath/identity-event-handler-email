@@ -17,16 +17,12 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <%@page import="org.apache.axis2.context.ConfigurationContext" %>
-<jsp:include page="../dialog/display_messages.jsp"/>
 <%@page import="org.owasp.encoder.Encode" %>
 <%@page import="org.wso2.carbon.CarbonConstants" %>
 <%@ page import="org.wso2.carbon.email.mgt.ui.I18nEmailMgtConfigServiceClient" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
-<%@ page import="org.wso2.carbon.utils.ServerConstants" %>
-<script type="text/javascript" src="extensions/js/vui.js"></script>
-<script type="text/javascript" src="../admin/js/main.js"></script>
-
+<%@page import="org.wso2.carbon.utils.ServerConstants" %>
 
 <%
     String httpMethod = request.getMethod();
